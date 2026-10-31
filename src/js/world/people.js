@@ -10,7 +10,13 @@ const UP = new THREE.Vector3(0, 1, 0);
 let source = null; // the loaded glTF: { scene, animations }
 
 export async function loadPeople() {
-  source = await new GLTFLoader().loadAsync(LOOK.people.model);
+  const loader = new GLTFLoader();
+  // the claude.ai preview can't serve .glb files, so its build inlines the model as base64 (see build.py)
+  const inline = document.getElementById("personGlb");
+  if (inline) {
+    const bin = Uint8Array.from(atob(inline.textContent.trim()), (c) => c.charCodeAt(0));
+    source = await loader.parseAsync(bin.buffer, "");
+  } else source = await loader.loadAsync(LOOK.people.model);
   return source;
 }
 

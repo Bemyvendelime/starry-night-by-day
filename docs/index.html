@@ -4711,7 +4711,12 @@ function restore(bones, snap) {
 var UP = new THREE8.Vector3(0, 1, 0);
 var source = null;
 async function loadPeople() {
-  source = await new GLTFLoader().loadAsync(LOOK.people.model);
+  const loader = new GLTFLoader();
+  const inline = document.getElementById("personGlb");
+  if (inline) {
+    const bin = Uint8Array.from(atob(inline.textContent.trim()), (c) => c.charCodeAt(0));
+    source = await loader.parseAsync(bin.buffer, "");
+  } else source = await loader.loadAsync(LOOK.people.model);
   return source;
 }
 function makePerson({ height, mat, headScale = 1 }) {
