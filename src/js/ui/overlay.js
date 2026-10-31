@@ -41,7 +41,7 @@ function frameOn(cam, p, { drop, half, tilt }) {
 export function placeWaterPeople(a, c) {
   adultUp = a; child = c;
   for (const p of [a, c]) { p.root.position.copy(AT); water.add(p.root); p.root.updateMatrixWorld(true); }
-  poseLookingUp(a); poseWaving(c, 0);
+  poseLookingUp(a); poseWaving(c, null);
   frameOn(camA, a, LOOK.people.waterFrame.adult);
   frameOn(camB, c, LOOK.people.waterFrame.child);
 }
@@ -65,7 +65,7 @@ export function updateOverlay(t, motion, renderer) {
   lastWave = t;
   camSave.copy(U.uCam.value);
   poseLookingUp(adultUp);
-  poseWaving(child, t * motion);
+  poseWaving(child, motion ? t : null);
   draw(renderer, rtA, adultUp, camA);
   draw(renderer, rtB, child, camB);
   renderer.setRenderTarget(null);

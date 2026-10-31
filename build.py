@@ -77,9 +77,11 @@ def between(s, a, b):
 b64 = base64.b64encode((SRC / "assets/starry.jpg").read_bytes()).decode()
 frag = between(page, "<!--HEAD-->", "<!--/HEAD-->") + between(page, "<!--BODY-->", "<!--/BODY-->")
 frag = frag.replace('src="assets/starry.jpg"', 'src="data:image/jpeg;base64,' + b64 + '"')
-# the preview can't serve .glb files: inline the person model, people.js parses it without a fetch
-glb = base64.b64encode((SRC / "assets/models/person.glb").read_bytes()).decode()
-frag = frag.replace('<script type="module">', '<script type="text/plain" id="personGlb">' + glb + '</script>\n<script type="module">', 1)
+# the preview can't serve .glb files: inline the people models, people.js parses them without a fetch
+for tag, name in (("personGlb", "person.glb"), ("childGlb", "child.glb")):
+    if (SRC / "assets/models" / name).exists():
+        glb = base64.b64encode((SRC / "assets/models" / name).read_bytes()).decode()
+        frag = frag.replace('<script type="module">', f'<script type="text/plain" id="{tag}">' + glb + '</script>\n<script type="module">', 1)
 # the Artifact viewer gets plain CDN imports instead of the import map
 THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
 frag = re.sub(r'<script type="importmap">.*?</script>\n?', "", frag, flags=re.S)

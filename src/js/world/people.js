@@ -3,36 +3,54 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
-import { findBones, reach, turn, snapshot, restore } from "../gfx/rig.js";
+import { findBones, reach, aim, turn, snapshot, restore } from "../gfx/rig.js";
 import { LOOK } from "../content/look.js";
 
 const UP = new THREE.Vector3(0, 1, 0);
-let source = null; // the loaded glTF: { scene, animations }
+let source = null, kidSource = null; // the loaded glTFs: { scene, animations }
 
-export async function loadPeople() {
-  const loader = new GLTFLoader();
-  // the claude.ai preview can't serve .glb files, so its build inlines the model as base64 (see build.py)
-  const inline = document.getElementById("personGlb");
+// the claude.ai preview can't serve .glb files, so its build inlines the models as base64 (see build.py)
+async function loadGlb(loader, url, inlineId) {
+  const inline = document.getElementById(inlineId);
   if (inline) {
     const bin = Uint8Array.from(atob(inline.textContent.trim()), (c) => c.charCodeAt(0));
-    source = await loader.parseAsync(bin.buffer, "");
-  } else source = await loader.loadAsync(LOOK.people.model);
-  return source;
+    return loader.parseAsync(bin.buffer, "");
+  }
+  return loader.loadAsync(url);
+}
+export async function loadPeople() {
+  const loader = new GLTFLoader();
+  source = await loadGlb(loader, LOOK.people.model, "personGlb");
+  kidSource = LOOK.people.childModel ? await loadGlb(loader, LOOK.people.childModel, "childGlb") : source;
+}
+
+// A clip's tracks bound to one cloned body, so a pose can be set straight from the keyframes at any time.
+// (An AnimationMixer only writes a bone whose value changed since its last update, so posing on top of a clip
+// every frame, at a time that doesn't move, would leave our own changes in place and pile them up.)
+function bindClip(body, clip) {
+  return clip.tracks.flatMap((track) => {
+    const dot = track.name.lastIndexOf(".");
+    const obj = body.getObjectByName(track.name.slice(0, dot)), prop = track.name.slice(dot + 1);
+    return obj && obj[prop] ? [{ obj, prop, at: track.createInterpolant() }] : [];
+  });
+}
+function setClipPose(bound, time) {
+  for (const { obj, prop, at } of bound) obj[prop].fromArray(at.evaluate(time));
 }
 
 // One person: a clone of the model scaled to `height` (m), feet at the root's origin, facing the root's +z.
-export function makePerson({ height, mat, headScale = 1 }) {
+export function makePerson({ height, mat, headScale = 1, kid = false }) {
+  const src = kid ? kidSource : source;
   const root = new THREE.Group();
-  const body = SkeletonUtils.clone(source.scene);
+  const body = SkeletonUtils.clone(src.scene);
   body.traverse((o) => { if (o.isMesh) { o.material = mat; o.frustumCulled = false; } });
   root.add(body);
   // start from a natural standing frame of the model's idle clip if it has one (its rest pose may be a T-pose)
-  const idle = source.animations.find((a) => new RegExp(LOOK.people.idleClip, "i").test(a.name));
-  if (idle) {
-    const mixer = new THREE.AnimationMixer(body);
-    mixer.clipAction(idle).play();
-    mixer.setTime(LOOK.people.idleTime);
-  }
+  const idle = src.animations.find((a) => new RegExp(LOOK.people.idleClip, "i").test(a.name));
+  if (idle) setClipPose(bindClip(body, idle), LOOK.people.idleTime);
+  // the whole idle pose, every bone: a clip played later only moves its own bones, the rest stay as here
+  const idlePose = [];
+  body.traverse((o) => { if (o.isBone) idlePose.push([o, o.position.clone(), o.quaternion.clone()]); });
   body.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(body);
   const s = height / (box.max.y - box.min.y);
@@ -42,7 +60,10 @@ export function makePerson({ height, mat, headScale = 1 }) {
   if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   root.updateMatrixWorld(true);
-  return { root, body, bones, base: snapshot(bones) };
+  // a T-pose (hands level with the shoulders) needs its arms brought down; an idle pose already has them down
+  const y = (b) => (b ? b.getWorldPosition(new THREE.Vector3()).y : 0);
+  const tpose = Math.abs(y(bones.handL) - y(bones.upperArmL)) < 0.1 * (height / 1.7);
+  return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
 }
 
 // A bald mannequin reads as a doll; a cap of hair on the head bone reads as a person.
@@ -96,6 +117,7 @@ function start(p) {
 const off = (from, ax, r, u, f) => from.clone().addScaledVector(ax.right, r).addScaledVector(UP, u).addScaledVector(ax.fwd, f);
 
 function armsDown(p, ax) {
+  if (!p.tpose) return;
   const B = p.bones;
   for (const [side, sx] of SIDES) {
     if (!B["upperArm" + side]) continue;
@@ -147,8 +169,36 @@ export function poseLookingUp(p) {
   turn(B.neck, ax.right, 0.25);
   turn(B.head, ax.right, 0.3);
 }
+// The model's own wave clip when it has one (a real wave: shoulder, elbow and wrist), then the head turned up to us.
+// t = seconds, or null for a still frame. The clip raises the hand, waves and lowers it again; looping all of it would
+// drop the hand every second, so after raising the hand it repeats only the waving part.
 export function poseWaving(p, t) {
+  const W = LOOK.people.wave;
+  const wave = p.clips.find((a) => new RegExp(W.clip, "i").test(a.name));
+  if (wave) {
+    let ct = W.still;
+    if (t !== null) {
+      if (p.waveT0 === undefined || t - p.waveLast > 0.5) p.waveT0 = t; // shown again after a gap: raise the hand again
+      p.waveLast = t;
+      const s = (t - p.waveT0) * W.speed;
+      ct = s < W.up ? s : W.up + ((s - W.up) % W.loop);
+    }
+    p.wave ??= bindClip(p.body, wave);
+    // every bone back to the idle pose, then the wave clip moves only its own bones (arm, chest, head)
+    for (const [b, pos, q] of p.idlePose) { b.position.copy(pos); b.quaternion.copy(q); }
+    setClipPose(p.wave, ct);
+    p.root.updateMatrixWorld(true);
+    const ax = axes(p), B = p.bones;
+    // the clip waves close beside the head; swing the whole arm out from the shoulder so the hand reads on its own
+    const [side, sx] = pos(B.handL).y > pos(B.handR).y ? SIDES[0] : SIDES[1];
+    const hand = pos(B["hand" + side]);
+    aim(B["upperArm" + side], B["hand" + side], hand.addScaledVector(ax.right, sx * W.out).addScaledVector(UP, W.lift));
+    turn(p.bones.neck, ax.right, 0.22);
+    turn(p.bones.head, ax.right, 0.28);
+    return;
+  }
   const ax = start(p), B = p.bones;
+  t = t ?? 0;
   armsDown(p, ax);
   turn(B.neck, ax.right, 0.3);
   turn(B.head, ax.right, 0.32);

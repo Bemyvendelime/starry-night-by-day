@@ -3,24 +3,25 @@
 // (two-bone IK for arms and legs) and turn the spine and head about world axes.
 import * as THREE from "three";
 
+// glTF loaders drop the "." in names ("UpperArm.L" arrives as "UpperArmL"), so the side suffix may have no separator
 const ROLES = {
   hips: [/hips$/i, /pelvis/i, /^root$/i],
   spine: [/spine$/i, /spine_?0?1$/i, /abdomen/i],
   chest: [/spine_?0?2$/i, /spine2$/i, /chest/i, /torso/i, /spine1$/i],
   neck: [/neck/i],
   head: [/head$/i, /^head/i],
-  upperArmL: [/left.*arm$/i, /upper_?arm.*(\.|_)l$/i, /upperarm_l/i, /l.*upper.?arm/i, /arm(\.|_)l$/i],
-  lowerArmL: [/left.*fore.?arm/i, /lower_?arm.*(\.|_)l$/i, /lowerarm_l/i, /fore.?arm(\.|_)l$/i],
-  handL: [/left.*hand$/i, /hand(\.|_)l$/i, /^hand_l/i, /palm.*(\.|_)l$/i, /wrist.*(\.|_)l$/i],
-  upperArmR: [/right.*arm$/i, /upper_?arm.*(\.|_)r$/i, /upperarm_r/i, /r.*upper.?arm/i, /arm(\.|_)r$/i],
-  lowerArmR: [/right.*fore.?arm/i, /lower_?arm.*(\.|_)r$/i, /lowerarm_r/i, /fore.?arm(\.|_)r$/i],
-  handR: [/right.*hand$/i, /hand(\.|_)r$/i, /^hand_r/i, /palm.*(\.|_)r$/i, /wrist.*(\.|_)r$/i],
-  upperLegL: [/left.*up.?leg/i, /upper_?leg.*(\.|_)l$/i, /thigh.*(\.|_)l$/i, /thigh_l/i],
-  lowerLegL: [/left.*leg$/i, /lower_?leg.*(\.|_)l$/i, /shin.*(\.|_)l$/i, /calf_l/i, /calf.*(\.|_)l$/i],
-  footL: [/left.*foot$/i, /foot(\.|_)l$/i, /foot_l$/i, /ankle.*(\.|_)l$/i],
-  upperLegR: [/right.*up.?leg/i, /upper_?leg.*(\.|_)r$/i, /thigh.*(\.|_)r$/i, /thigh_r/i],
-  lowerLegR: [/right.*leg$/i, /lower_?leg.*(\.|_)r$/i, /shin.*(\.|_)r$/i, /calf_r/i, /calf.*(\.|_)r$/i],
-  footR: [/right.*foot$/i, /foot(\.|_)r$/i, /foot_r$/i, /ankle.*(\.|_)r$/i],
+  upperArmL: [/left.*arm$/i, /upper_?arm[._]?l$/i, /l.*upper.?arm/i],
+  lowerArmL: [/left.*fore.?arm/i, /lower_?arm[._]?l$/i, /fore.?arm[._]?l$/i],
+  handL: [/left.*hand$/i, /hand[._]?l$/i, /wrist[._]?l$/i, /palm[._]?l$/i],
+  upperArmR: [/right.*arm$/i, /upper_?arm[._]?r$/i, /r.*upper.?arm/i],
+  lowerArmR: [/right.*fore.?arm/i, /lower_?arm[._]?r$/i, /fore.?arm[._]?r$/i],
+  handR: [/right.*hand$/i, /hand[._]?r$/i, /wrist[._]?r$/i, /palm[._]?r$/i],
+  upperLegL: [/left.*up.?leg/i, /upper_?leg[._]?l$/i, /thigh[._]?l$/i],
+  lowerLegL: [/left.*leg$/i, /lower_?leg[._]?l$/i, /shin[._]?l$/i, /calf[._]?l$/i],
+  footL: [/left.*foot$/i, /foot[._]?l$/i, /ankle[._]?l$/i],
+  upperLegR: [/right.*up.?leg/i, /upper_?leg[._]?r$/i, /thigh[._]?r$/i],
+  lowerLegR: [/right.*leg$/i, /lower_?leg[._]?r$/i, /shin[._]?r$/i, /calf[._]?r$/i],
+  footR: [/right.*foot$/i, /foot[._]?r$/i, /ankle[._]?r$/i],
 };
 
 // role -> bone. Each role takes the first bone whose name matches, trying the patterns in order.

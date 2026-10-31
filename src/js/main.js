@@ -93,7 +93,7 @@ function frame(ts) {
     seatPerson(makePerson({ height: H.adultHeight, mat: bodyMaterial }));
     placeReader(makePerson({ height: H.adultHeight, mat: adultMat }));
     const inWater = hatch({ rim: 1.8, base: 0.02, seed: 13, sp: 0.016, gain: 0.45 });
-    placeWaterPeople(makePerson({ height: H.adultHeight, mat: inWater }), makePerson({ height: H.childHeight, mat: inWater, headScale: H.childHeadScale }));
+    placeWaterPeople(makePerson({ height: H.adultHeight, mat: inWater }), makePerson({ height: H.childHeight, mat: inWater, headScale: H.childHeadScale, kid: true }));
   } catch (e) { console.error("people", e); }
   setLoader(0.8);
   drawPaper();

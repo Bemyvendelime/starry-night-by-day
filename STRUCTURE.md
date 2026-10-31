@@ -1,4 +1,4 @@
-# 코드 구조 (갱신 2026-11-01, v2: 뼈대 인물·소품·자동 빌드)
+# 코드 구조 (갱신 2026-11-01, v2.1: CC0 인물로 교체·아이 손 흔들기 클립)
 
 ```
 sian/
@@ -7,7 +7,7 @@ sian/
     style.css                 색 토큰·글꼴·자막·카드·막대·DEV 상자
     assets/starry.jpg         별이 빛나는 밤 1024px (퍼블릭 도메인)
     assets/og.jpg             링크 미리보기 그림
-    assets/models/            사람 모델(person.glb)과 출처(CREDITS.json)
+    assets/models/            사람 모델(person.glb 어른·child.glb 아이, 둘 다 Quaternius CC0)과 출처(CREDITS.json)
     js/
       content/letter.js       ✏️ 원고: LINES(편지 줄·망설임), ENDING(카드), SCREEN·CODE(모니터), HINTS, OPENING
       content/beats.js        ✏️ 장면 순서표 BEATS (15장면)
@@ -24,7 +24,7 @@ sian/
       gfx/rig.js              뼈 이름 찾기(findBones), 2관절 IK(reach), 월드 축 회전(turn)
       world/room.js           방 전체, 모니터 캔버스, 벽 글자판
       world/lake.js           별밤 속 호숫가, 편지 자리(placeReader), 편지 접기(fold)와 손이 편지를 따라감, 붓질·별
-      world/people.js         glTF 인물 불러와 복제(makePerson), 머리카락, 자세: 앉기·편지 읽기·올려다보기·손 흔들기
+      world/people.js         glTF 인물 불러와 복제(makePerson), 클립 키프레임을 뼈에 바로 적용(bindClip·setClipPose), 머리카락, 자세: 앉기·편지 읽기·올려다보기·손 흔들기(Wave 클립)
       ui/screen.js            모니터 화면 그리기
       ui/walls.js             벽 글씨 그리기
       ui/overlay.js           그림 확대·내려다본 호수, 물속 어른·아이를 따로 렌더(2:1 렌더 타깃)해 물에 깖

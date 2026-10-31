@@ -968,21 +968,28 @@ var LOOK = {
   // 사람 모델 (뼈대가 있는 glTF 하나를 복제해 씀. 바꾸면 world/people.js 가 뼈 이름을 찾아 자세를 다시 잡음)
   people: {
     model: "assets/models/person.glb",
-    idleClip: "idle",
+    // 어른 (Quaternius 'Hoodie Character', CC0)
+    childModel: "assets/models/child.glb",
+    // 물속 아이 (Quaternius 'Casual Character', CC0). 비우면 어른 모델을 줄여 씀
+    idleClip: "Idle_Neutral$",
     // 서 있는 기본 자세를 가져올 애니메이션 이름 (없으면 모델의 기본 자세)
     idleTime: 0.5,
-    hair: true,
-    // 머리카락이 없는 마네킹 모델이면 머리뼈에 머리카락을 붙임 (머리카락이 있는 모델이면 false)
+    // 물속 아이가 손 흔드는 애니메이션 (없으면 IK 로 흔듦): 처음 up 초 동안 손을 들고, 그 뒤 up~up+loop 구간을 되풀이.
+    // still = 움직임 없는 화면(캡처·동작 줄이기)에서 멈춰 둘 순간. 이 숫자들은 Quaternius Wave 클립을 재서 정함
+    // out·lift = 클립보다 손을 옆으로·위로 더 뻗는 거리(m)
+    wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.75, out: 0.1, lift: 0.05 },
+    hair: false,
+    // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
     hairFit: { size: 0.66, lift: 0.62 },
     // 머리 크기에 대한 머리카락 반지름·높이 비율 (주소에 ?hairdebug 를 붙이면 빨갛게 보임)
     adultHeight: 1.72,
     // 어른 키(m)
     childHeight: 1.2,
     // 아이 키(m)
-    childHeadScale: 1.2,
+    childHeadScale: 1.12,
     // 아이 머리를 몸에 비해 크게
     // 물속 인물 화면: 머리에서 drop(m) 아래를 가운데로, 위아래 half(m) 만큼, tilt(라디안) 위에서 내려다봄
-    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.45 }, child: { drop: 0.08, half: 0.3, tilt: 0.45 } }
+    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.35 }, child: { drop: 0.1, half: 0.36, tilt: 0.2 } }
   },
   // 물에 비친 아이
   childGlow: 0.85,
@@ -4624,18 +4631,18 @@ var ROLES = {
   chest: [/spine_?0?2$/i, /spine2$/i, /chest/i, /torso/i, /spine1$/i],
   neck: [/neck/i],
   head: [/head$/i, /^head/i],
-  upperArmL: [/left.*arm$/i, /upper_?arm.*(\.|_)l$/i, /upperarm_l/i, /l.*upper.?arm/i, /arm(\.|_)l$/i],
-  lowerArmL: [/left.*fore.?arm/i, /lower_?arm.*(\.|_)l$/i, /lowerarm_l/i, /fore.?arm(\.|_)l$/i],
-  handL: [/left.*hand$/i, /hand(\.|_)l$/i, /^hand_l/i, /palm.*(\.|_)l$/i, /wrist.*(\.|_)l$/i],
-  upperArmR: [/right.*arm$/i, /upper_?arm.*(\.|_)r$/i, /upperarm_r/i, /r.*upper.?arm/i, /arm(\.|_)r$/i],
-  lowerArmR: [/right.*fore.?arm/i, /lower_?arm.*(\.|_)r$/i, /lowerarm_r/i, /fore.?arm(\.|_)r$/i],
-  handR: [/right.*hand$/i, /hand(\.|_)r$/i, /^hand_r/i, /palm.*(\.|_)r$/i, /wrist.*(\.|_)r$/i],
-  upperLegL: [/left.*up.?leg/i, /upper_?leg.*(\.|_)l$/i, /thigh.*(\.|_)l$/i, /thigh_l/i],
-  lowerLegL: [/left.*leg$/i, /lower_?leg.*(\.|_)l$/i, /shin.*(\.|_)l$/i, /calf_l/i, /calf.*(\.|_)l$/i],
-  footL: [/left.*foot$/i, /foot(\.|_)l$/i, /foot_l$/i, /ankle.*(\.|_)l$/i],
-  upperLegR: [/right.*up.?leg/i, /upper_?leg.*(\.|_)r$/i, /thigh.*(\.|_)r$/i, /thigh_r/i],
-  lowerLegR: [/right.*leg$/i, /lower_?leg.*(\.|_)r$/i, /shin.*(\.|_)r$/i, /calf_r/i, /calf.*(\.|_)r$/i],
-  footR: [/right.*foot$/i, /foot(\.|_)r$/i, /foot_r$/i, /ankle.*(\.|_)r$/i]
+  upperArmL: [/left.*arm$/i, /upper_?arm[._]?l$/i, /l.*upper.?arm/i],
+  lowerArmL: [/left.*fore.?arm/i, /lower_?arm[._]?l$/i, /fore.?arm[._]?l$/i],
+  handL: [/left.*hand$/i, /hand[._]?l$/i, /wrist[._]?l$/i, /palm[._]?l$/i],
+  upperArmR: [/right.*arm$/i, /upper_?arm[._]?r$/i, /r.*upper.?arm/i],
+  lowerArmR: [/right.*fore.?arm/i, /lower_?arm[._]?r$/i, /fore.?arm[._]?r$/i],
+  handR: [/right.*hand$/i, /hand[._]?r$/i, /wrist[._]?r$/i, /palm[._]?r$/i],
+  upperLegL: [/left.*up.?leg/i, /upper_?leg[._]?l$/i, /thigh[._]?l$/i],
+  lowerLegL: [/left.*leg$/i, /lower_?leg[._]?l$/i, /shin[._]?l$/i, /calf[._]?l$/i],
+  footL: [/left.*foot$/i, /foot[._]?l$/i, /ankle[._]?l$/i],
+  upperLegR: [/right.*up.?leg/i, /upper_?leg[._]?r$/i, /thigh[._]?r$/i],
+  lowerLegR: [/right.*leg$/i, /lower_?leg[._]?r$/i, /shin[._]?r$/i, /calf[._]?r$/i],
+  footR: [/right.*foot$/i, /foot[._]?r$/i, /ankle[._]?r$/i]
 };
 function findBones(root) {
   const bones = [];
@@ -4710,18 +4717,34 @@ function restore(bones, snap) {
 // src/js/world/people.js
 var UP = new THREE8.Vector3(0, 1, 0);
 var source = null;
-async function loadPeople() {
-  const loader = new GLTFLoader();
-  const inline = document.getElementById("personGlb");
+var kidSource = null;
+async function loadGlb(loader, url, inlineId) {
+  const inline = document.getElementById(inlineId);
   if (inline) {
     const bin = Uint8Array.from(atob(inline.textContent.trim()), (c) => c.charCodeAt(0));
-    source = await loader.parseAsync(bin.buffer, "");
-  } else source = await loader.loadAsync(LOOK.people.model);
-  return source;
+    return loader.parseAsync(bin.buffer, "");
+  }
+  return loader.loadAsync(url);
 }
-function makePerson({ height, mat, headScale = 1 }) {
+async function loadPeople() {
+  const loader = new GLTFLoader();
+  source = await loadGlb(loader, LOOK.people.model, "personGlb");
+  kidSource = LOOK.people.childModel ? await loadGlb(loader, LOOK.people.childModel, "childGlb") : source;
+}
+function bindClip(body, clip) {
+  return clip.tracks.flatMap((track) => {
+    const dot = track.name.lastIndexOf(".");
+    const obj = body.getObjectByName(track.name.slice(0, dot)), prop = track.name.slice(dot + 1);
+    return obj && obj[prop] ? [{ obj, prop, at: track.createInterpolant() }] : [];
+  });
+}
+function setClipPose(bound, time) {
+  for (const { obj, prop, at } of bound) obj[prop].fromArray(at.evaluate(time));
+}
+function makePerson({ height, mat, headScale = 1, kid = false }) {
+  const src = kid ? kidSource : source;
   const root = new THREE8.Group();
-  const body = clone(source.scene);
+  const body = clone(src.scene);
   body.traverse((o) => {
     if (o.isMesh) {
       o.material = mat;
@@ -4729,12 +4752,12 @@ function makePerson({ height, mat, headScale = 1 }) {
     }
   });
   root.add(body);
-  const idle = source.animations.find((a) => new RegExp(LOOK.people.idleClip, "i").test(a.name));
-  if (idle) {
-    const mixer = new THREE8.AnimationMixer(body);
-    mixer.clipAction(idle).play();
-    mixer.setTime(LOOK.people.idleTime);
-  }
+  const idle = src.animations.find((a) => new RegExp(LOOK.people.idleClip, "i").test(a.name));
+  if (idle) setClipPose(bindClip(body, idle), LOOK.people.idleTime);
+  const idlePose = [];
+  body.traverse((o) => {
+    if (o.isBone) idlePose.push([o, o.position.clone(), o.quaternion.clone()]);
+  });
   body.updateMatrixWorld(true);
   const box2 = new THREE8.Box3().setFromObject(body);
   const s = height / (box2.max.y - box2.min.y);
@@ -4744,7 +4767,9 @@ function makePerson({ height, mat, headScale = 1 }) {
   if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   root.updateMatrixWorld(true);
-  return { root, body, bones, base: snapshot(bones) };
+  const y = (b) => b ? b.getWorldPosition(new THREE8.Vector3()).y : 0;
+  const tpose = Math.abs(y(bones.handL) - y(bones.upperArmL)) < 0.1 * (height / 1.7);
+  return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
 }
 function addHair(head, mat, child2) {
   head.updateMatrixWorld(true);
@@ -4789,6 +4814,7 @@ function start(p) {
 }
 var off = (from, ax, r, u, f) => from.clone().addScaledVector(ax.right, r).addScaledVector(UP, u).addScaledVector(ax.fwd, f);
 function armsDown(p, ax) {
+  if (!p.tpose) return;
   const B = p.bones;
   for (const [side, sx2] of SIDES) {
     if (!B["upperArm" + side]) continue;
@@ -4832,7 +4858,33 @@ function poseLookingUp(p) {
   turn(B.head, ax.right, 0.3);
 }
 function poseWaving(p, t) {
+  const W = LOOK.people.wave;
+  const wave = p.clips.find((a) => new RegExp(W.clip, "i").test(a.name));
+  if (wave) {
+    let ct = W.still;
+    if (t !== null) {
+      if (p.waveT0 === void 0 || t - p.waveLast > 0.5) p.waveT0 = t;
+      p.waveLast = t;
+      const s = (t - p.waveT0) * W.speed;
+      ct = s < W.up ? s : W.up + (s - W.up) % W.loop;
+    }
+    p.wave ??= bindClip(p.body, wave);
+    for (const [b, pos2, q] of p.idlePose) {
+      b.position.copy(pos2);
+      b.quaternion.copy(q);
+    }
+    setClipPose(p.wave, ct);
+    p.root.updateMatrixWorld(true);
+    const ax2 = axes(p), B2 = p.bones;
+    const [side, sx2] = pos(B2.handL).y > pos(B2.handR).y ? SIDES[0] : SIDES[1];
+    const hand = pos(B2["hand" + side]);
+    aim(B2["upperArm" + side], B2["hand" + side], hand.addScaledVector(ax2.right, sx2 * W.out).addScaledVector(UP, W.lift));
+    turn(p.bones.neck, ax2.right, 0.22);
+    turn(p.bones.head, ax2.right, 0.28);
+    return;
+  }
   const ax = start(p), B = p.bones;
+  t = t ?? 0;
   armsDown(p, ax);
   turn(B.neck, ax.right, 0.3);
   turn(B.head, ax.right, 0.32);
@@ -5223,7 +5275,7 @@ function placeWaterPeople(a, c) {
     p.root.updateMatrixWorld(true);
   }
   poseLookingUp(a);
-  poseWaving(c, 0);
+  poseWaving(c, null);
   frameOn(camA, a, LOOK.people.waterFrame.adult);
   frameOn(camB, c, LOOK.people.waterFrame.child);
 }
@@ -5245,7 +5297,7 @@ function updateOverlay(t, motion, renderer2) {
   lastWave = t;
   camSave.copy(U.uCam.value);
   poseLookingUp(adultUp);
-  poseWaving(child, t * motion);
+  poseWaving(child, motion ? t : null);
   draw(renderer2, rtA, adultUp, camA);
   draw(renderer2, rtB, child, camB);
   renderer2.setRenderTarget(null);
@@ -5759,7 +5811,7 @@ function frame(ts) {
     seatPerson(makePerson({ height: H.adultHeight, mat: bodyMaterial }));
     placeReader(makePerson({ height: H.adultHeight, mat: adultMat }));
     const inWater = hatch({ rim: 1.8, base: 0.02, seed: 13, sp: 0.016, gain: 0.45 });
-    placeWaterPeople(makePerson({ height: H.adultHeight, mat: inWater }), makePerson({ height: H.childHeight, mat: inWater, headScale: H.childHeadScale }));
+    placeWaterPeople(makePerson({ height: H.adultHeight, mat: inWater }), makePerson({ height: H.childHeight, mat: inWater, headScale: H.childHeadScale, kid: true }));
   } catch (e) {
     console.error("people", e);
   }
