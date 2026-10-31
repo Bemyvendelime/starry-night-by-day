@@ -8,13 +8,14 @@ import { U } from "./core/uniforms.js";
 import { tween, setCam, rig, clamp } from "./core/motion.js";
 import { typer, finalOf } from "./core/typer.js";
 import { sound } from "./audio/sound.js";
-import { winSky, sitHead } from "./world/room.js";
+import { winSky, sitHead, ipad } from "./world/room.js";
 import { fold } from "./world/lake.js";
 import { ovU } from "./ui/overlay.js";
 import { drawWall, wallText, sideText } from "./ui/walls.js";
 import { el } from "./ui/dom.js";
 
 const FOLD_AT = BEATS.findIndex((b) => b.fold);
+const IPAD_AT = BEATS.findIndex((b) => b.ipad);
 export const LAKE_AT = BEATS.findIndex((b) => b.world === "lake");
 let timers = [];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
@@ -37,6 +38,7 @@ function showText(b, text, done, anim) {
   if (done) {
     el.live.textContent = text;
     if (b.fold && anim) startFold(); // the last line is read: fold the letter
+    if (b.ipad && anim) tween(ipad, "light", 1, 1.6, 0.2); // "...아이패드 배경화면으로": the iPad wakes
   }
 }
 
@@ -110,6 +112,9 @@ export function applyBeat(n, animate) {
       later(() => tween(ovU.uMaskMix, "value", 1, 1.4), 2700);
     } else ovU.uMaskMix.value = 1;
   } else ovU.uMaskMix.value = b.pov ? 1 : 0;
+
+  // the iPad on the sill: dark until its line, lit after
+  if (IPAD_AT >= 0) tween(ipad, "light", n > IPAD_AT || (n === IPAD_AT && !anim) ? 1 : 0, 0);
 
   // the letter in the grown-up's hands: open until it is read, folded after
   if (FOLD_AT >= 0) {

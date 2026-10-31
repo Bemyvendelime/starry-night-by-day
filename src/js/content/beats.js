@@ -14,6 +14,7 @@
 //   hint     손가락 안내 ("room" | "badge")
 //   sky      창 속 별밤 [얼마나 열렸나 0~1, 색이 얼마나 들었나 0~1]
 //   head     앉은 사람이 창을 돌아봄
+//   ipad     줄이 다 찍히면 창틀의 아이패드가 별밤 배경화면으로 켜짐 (그 뒤 장면에서도 켜져 있음)
 //   paint    그림이 화면을 가득 채움
 //   world    "lake" 면 별이 빛나는 밤 속 호숫가
 //   fold     줄이 다 찍히면 편지를 접음
@@ -33,7 +34,7 @@ export const BEATS = [
   { label: "벽", cam: "over2", compose: true, line: "l5", show: "wall" },
   { label: "창", cam: "window", compose: true, line: "l6", show: "side", sky: [0.35, 0], head: true, music: true, chord: 0 },
   { label: "창", cam: "window2", compose: true, line: "l7", show: "side", sky: [0.7, 0.5], head: true, music: true, chord: 1 },
-  { label: "창", cam: "window3", compose: true, line: "l8", show: "side", sky: [1, 1], head: true, music: true, chord: 2 },
+  { label: "창", cam: "window3", compose: true, line: "l8", show: "side", sky: [1, 1], head: true, ipad: true, music: true, chord: 2 },
   { label: "그림 속으로", cam: "into", line: "l9", show: "cap", sky: [1, 1], head: true, paint: true, music: true, chord: 3 },
   { label: "별밤 속", cam: "lakeBack", world: "lake", line: "l10", show: "anchor", music: true, chord: 0 },
   { label: "다 읽고", cam: "lakeFold", world: "lake", line: "last", show: "capHigh", fold: true, music: true, chord: 2 },

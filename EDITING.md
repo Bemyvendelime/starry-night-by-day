@@ -17,6 +17,9 @@
 | 호숫가 그림 위치(마을이 보이나 하늘만 보이나) | `src/js/content/look.js` | `lake.horizon` |
 | 공중을 도는 붓질 조각 수·진하기, 큰 별 수 | `src/js/content/look.js` | `lake.strokes`, `lake.strokeOpacity`, `lake.stars` |
 | 아이 둘레 빛, 손 흔드는 빠르기 | `src/js/content/look.js` | `childGlow`, `waveSpeed` |
+| 사람 모델 파일·키·아이 머리 크기·머리카락 | `src/js/content/look.js` | `people` (model, adultHeight, childHeight, childHeadScale, hair, hairFit) |
+| 물속 사람을 비추는 화면 크기 | `src/js/content/look.js` | `people.waterFrame` |
+| 창틀 아이패드가 켜지는 장면 | `src/js/content/beats.js` | `ipad: true` 를 단 장면 |
 | 글자 찍는 속도 | `src/js/content/look.js` | `typing` |
 | 편지 접는 속도 | `src/js/content/look.js` | `fold` |
 | 소리 크기 | `src/js/content/look.js` | `sound` |
@@ -27,17 +30,19 @@
 
 | 부품 | 파일 |
 |---|---|
-| 방(책상·모니터·의자·앉은 사람·창·벽 글자판) | `src/js/world/room.js` |
+| 방(책상·모니터·의자·창·벽 글자판·커튼·스탠드·화분·액자·11시 47분 시계·창틀 아이패드) | `src/js/world/room.js` |
+| 사람(모델 불러오기·복제·머리카락·앉기·편지 들기·손 흔들기 자세) | `src/js/world/people.js` |
+| 자세 잡기 도구(뼈 이름 찾기, 2관절 IK) | `src/js/gfx/rig.js` |
 | 별밤 속 호숫가(그림 배경·호수·붓질·큰 별·편지 든 어른·편지 접기) | `src/js/world/lake.js` |
 | 모니터 화면 그리기(코딩 창·빨간 알림·편지 창) | `src/js/ui/screen.js` |
 | 벽에 쓰는 글씨 모양 | `src/js/ui/walls.js` |
-| 그림 확대 화면, 내려다본 호수, 물속 어른·손 흔드는 아이 실루엣 | `src/js/ui/overlay.js` (`drawAdult`, `drawChild`) |
+| 그림 확대 화면, 내려다본 호수, 물속 어른·손 흔드는 아이 (3D 인물을 따로 렌더해 물에 깔기) | `src/js/ui/overlay.js` |
 | 셰이더(펜 해칭·그림·수면·붓질·별·호수 화면) | `src/js/gfx/shaders.js` |
 | 장면 지휘(카메라·빛·접기·카드를 언제 움직이나) | `src/js/director.js` |
 | 탭·키·휠·스와이프 | `src/js/input.js` |
 | 소리 | `src/js/audio/sound.js` |
 
-코덱스로 뽑은 그림(물속 아이, 어른)으로 바꿀 때는 `overlay.js` 의 `drawChild` / `drawAdult` 에서 실루엣 대신 그 이미지를 그리면 됩니다.
+사람 모델을 바꿀 때는 뼈대가 있는 glTF(.glb)를 `src/assets/models/` 에 넣고 `look.js` 의 `people.model` 을 바꿉니다. `people.js` 가 뼈 이름(Mixamo·Quaternius·언리얼식)을 찾아 같은 자세를 다시 잡습니다. 머리카락이 있는 모델이면 `people.hair` 를 false 로. 출처는 `src/assets/models/CREDITS.json` 에 적습니다.
 
 ## 시점 맞추기 (?dev)
 
@@ -53,6 +58,8 @@ python -m http.server 8000 --directory src    # 고치면서 바로 보기: http
 python build.py                               # 한 파일로 묶기 → docs/index.html, build/starry-letter.html
 python deploy.py "무엇을 고쳤는지"             # 만들고 GitHub 에 올리기 → 1~2분 뒤 공개 주소에 반영
 ```
+
+PC 없이도 고칠 수 있습니다. github.com 의 저장소에서 `src/js/content/letter.js` 를 열고 연필 버튼으로 문장을 고친 뒤 Commit 하면, GitHub Actions(`.github/workflows/build.yml`)가 자동으로 묶어서 1~3분 뒤 공개 주소에 반영합니다. 저장소의 Actions 탭에서 build 가 초록이면 끝, 빨강이면 문법(쉼표·따옴표)이 틀린 것입니다.
 
 - 공개 주소: https://bemyvendelime.github.io/starry-night-by-day/
 - 장면 바로 열기: 주소 끝에 `#beat-12` (0부터 셈)

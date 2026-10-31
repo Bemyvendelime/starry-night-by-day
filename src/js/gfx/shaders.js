@@ -2,11 +2,19 @@
 
 /* Pen hatching (after Every Joule's ej_hatch): light becomes line width, lines keep their width on screen,
    a finer level fades in close up, and far away the lines turn into a flat tone. */
+// three.js's own skinning chunks let rigged people (glTF) bend their bones under the same pen lines
 export const HATCH_V = /* glsl */ `
+#include <common>
+#include <skinning_pars_vertex>
 varying vec3 vW; varying vec3 vN;
 void main() {
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal);
+  #include <beginnormal_vertex>
+  #include <skinbase_vertex>
+  #include <skinnormal_vertex>
+  #include <begin_vertex>
+  #include <skinning_vertex>
+  vec4 w = modelMatrix * vec4(transformed, 1.0);
+  vW = w.xyz; vN = normalize(mat3(modelMatrix) * objectNormal);
   gl_Position = projectionMatrix * viewMatrix * w;
 }`;
 
@@ -178,18 +186,20 @@ void main() {
     vec2 pu = vec2(0.12 + s.x * 0.62, 0.38 + (1.0 - s.y) * 0.58);
     vec3 sky = texture2D(uPaint, clamp(pu, 0.001, 0.999)).rgb;
     col = sky * mix(0.5, 0.92, s.y) + vec3(0.0, 0.01, 0.03);
-    vec2 mu = vec2((s.x - 0.5) * uAspect / 1.05 + 0.5, s.y * 1.02);
+    vec2 mu = vec2((s.x - 0.5) * uAspect / 2.0 + 0.5, s.y); // the people layer is 2:1
     float inside = step(0.0, mu.x) * step(mu.x, 1.0) * step(mu.y, 1.0);
-    float mA = texture2D(uMaskA, clamp(mu, 0.0, 1.0)).a;
-    float mB = texture2D(uMaskB, clamp(mu, 0.0, 1.0)).a;
+    vec4 fA = texture2D(uMaskA, clamp(mu, 0.0, 1.0));
+    vec4 fB = texture2D(uMaskB, clamp(mu, 0.0, 1.0));
+    float mB = fB.a;
     float halo = 0.0;
     for (int i = 0; i < 8; i++) {
       float a = float(i) * 0.785398;
       halo += texture2D(uMaskB, clamp(mu + vec2(cos(a), sin(a)) * 0.03, 0.0, 1.0)).a;
     }
     halo = clamp(halo / 8.0 - mB, 0.0, 1.0) * 1.4; // light only round the outside of the child
-    float m = mix(mA, mB, uMaskMix) * inside;
-    col = mix(col, vec3(0.012, 0.016, 0.03), m * 0.93);
+    vec4 f = mix(fA, fB, uMaskMix) * inside;
+    // the person in the water: their own pen-hatched render, darkened and tinted by the water
+    col = mix(col, f.rgb * 0.85 + vec3(0.008, 0.012, 0.026), f.a * 0.95);
     col += vec3(1.0, 0.82, 0.42) * halo * uMaskMix * uGlow * inside * 0.55;
     col = mix(col, vec3(0.006), smoothstep(0.09, 0.0, uv.y));
     col += vec3(1.0, 0.85, 0.45) * uSpark * exp(-length(q - vec2(0.0, 0.33)) * 40.0);

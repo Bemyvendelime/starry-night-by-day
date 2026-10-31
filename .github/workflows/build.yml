@@ -1,0 +1,31 @@
+# Edit src/ anywhere (even in the github.com editor) and this rebuilds docs/, which GitHub Pages serves.
+name: build
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "build.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci --no-audit --no-fund
+      - run: python build.py
+      - name: commit docs/ if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "build docs [skip ci]" && git push

@@ -1,0 +1,9 @@
+{
+  "name": "starry-night-by-day",
+  "private": true,
+  "description": "낮에도 별은 빛나니까 — build tooling only (three.js is served from the CDN at runtime)",
+  "devDependencies": {
+    "three": "0.160.0",
+    "esbuild": "0.24.0"
+  }
+}

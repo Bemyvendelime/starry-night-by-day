@@ -1,0 +1,9 @@
+[
+  {
+    "what": "3D 인물",
+    "name": "X Bot",
+    "author": "Adobe Mixamo (three.js 예제 모델 r160)",
+    "url": "https://github.com/mrdoob/three.js/blob/r160/examples/models/gltf/Xbot.glb",
+    "license": "Mixamo 이용 약관: 프로젝트 안에서 무료 사용, 모델 파일만 따로 재배포는 불가"
+  }
+]

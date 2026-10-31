@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Jost:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500;700&display=swap">
 <style>
-/* A4 two pages. Dark like the piece; one red (the notification), one star yellow. */
+/* A4 three pages. Dark like the piece; one red (the notification), one star yellow. */
 :root {
   --night: #09090c;
   --panel: #121217;
@@ -62,6 +62,19 @@ p { margin: 0; font: 300 9.6pt/1.75 var(--ko); }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
 .foot { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; display: flex; justify-content: space-between; gap: 6mm; font: 300 7.4pt/1.55 var(--ko); color: var(--ash); border-top: 1px solid var(--hair); padding-top: 2.5mm; }
 .foot b { font-weight: 500; color: var(--chalk); }
+.kw { display: inline-flex; align-items: baseline; gap: 2.5mm; padding: 1.6mm 3.2mm; border: 1px solid var(--star); border-radius: 99px; font: 500 10pt/1 var(--ko); color: var(--star); justify-self: start; }
+.kw .en { font: 400 10pt/1 var(--mark); letter-spacing: .14em; }
+.p2b { padding-top: 16mm; display: grid; gap: 7.5mm; }
+.block { display: grid; gap: 2.8mm; }
+.block p { font-size: 10.2pt; line-height: 1.85; }
+.lede2 { font: 300 15pt/1.6 var(--ko); color: var(--chalk); }
+.lede2 b { font-weight: 500; color: var(--star); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
+.card2 { background: var(--panel); border: 1px solid var(--hair); border-radius: 2mm; padding: 4.5mm 5mm; display: grid; gap: 2.4mm; align-content: start; }
+.card2 .lab { font: 400 10pt/1 var(--mark); letter-spacing: .14em; color: var(--ash); }
+.card2 p { font-size: 9.8pt; line-height: 1.8; }
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm; }
+.strip img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 1.5mm; display: block; }
 </style>
 </head>
 <body>
@@ -69,9 +82,10 @@ p { margin: 0; font: 300 9.6pt/1.75 var(--ko); }
 <section class="page">
   <div class="hero"><img src="img/b11.jpg" alt="별이 빛나는 밤 속 호숫가에서 편지를 읽는 어른의 뒷모습"></div>
   <div class="title pad">
-    <div class="eyebrow">SHINSEGAE 지식향연 2026 · 인문학 크리에이티브 공모전 · <b>예술을 바꾼 혁명, 인상주의</b></div>
+    <div class="eyebrow">SHINSEGAE 지식향연 2026 · 1차 미션 CREATIVE 에세이 · <b>예술을 바꾼 혁명, 인상주의</b></div>
     <h1>낮에도 별은 빛나니까</h1>
     <div class="sub">어린 나에게 쓰는 편지 — 화면을 눌러 한 줄씩 읽는 인터랙티브 웹 작품</div>
+    <div class="kw"><span class="en">KEYWORD</span>빛</div>
     <div class="by">허대훈 · 전기전자공학부</div>
   </div>
   <div class="view pad">
@@ -92,31 +106,57 @@ p { margin: 0; font: 300 9.6pt/1.75 var(--ko); }
 </section>
 
 <section class="page">
-  <div class="p2 pad">
-    <div class="intro">
+  <div class="p2b pad">
+    <div class="block">
+      <h2>키워드 · 빛<span class="en">KEYWORD</span></h2>
+      <p class="lede2">빛은 보일 때만 있는 것이 아닙니다. <b>낮에도 별은 빛납니다.</b></p>
+      <p>인상주의는 빛을 그렸습니다. 모네 「인상, 해돋이」(1872)의 해는 흑백으로 바꾸면 거의 사라집니다. 밝기가 아니라 색으로만 있는 빛이기 때문입니다. 고흐는 「별이 빛나는 밤」(1889)을 밤이 아니라 낮에 그렸습니다(MoMA). 저에게 빛은 보이지 않을 때에도 계속 있는 것, 그리고 지금의 나를 만든 것입니다.</p>
+    </div>
+    <div class="split">
+      <div class="card2">
+        <div class="lab">PROBLEM · 문제의식</div>
+        <p>저는 저에게 익숙해지기만 했지, 저를 설명하는 법을 몰랐습니다. 가장 좋아하는 작품이 무엇이냐는 질문에도 바로 답하지 못했습니다. 바쁘게 사는 동안 나를 만든 것은 보이지 않는 곳으로 밀려나 있었습니다.</p>
+      </div>
+      <div class="card2">
+        <div class="lab">CONCLUSION · 결론</div>
+        <p>돌아보니 배경화면도, 꿈속의 방도, 글씨체도 모두 2013년 미술 시간에 본 그림 한 장을 가리키고 있었습니다. 나를 설명하는 법은 나를 만든 빛을 찾는 것이었습니다. 그래서 이 편지는 나에게 쓰는 편지가 아니라, 나를 만든 '너', 어린 나에게 쓰는 편지가 되었습니다.</p>
+      </div>
+    </div>
+    <div class="block">
       <h2>작품 소개<span class="en">ABOUT</span></h2>
-      <p>2013년 무더운 여름 미술 시간에 본 「별이 빛나는 밤」은 지금 제 아이패드의 배경화면입니다. 나를 설명해 보라는 질문 앞에서 돌아보니, 배경화면도 꿈속의 방도 글씨체도 모두 그 그림을 가리키고 있었습니다. 이 작품은 그 사실을 편지로 바꾼 것입니다.</p>
       <p>편지 속 '너'가 누구인지는 끝까지 말하지 않습니다. 밤늦게 혼자 코딩하는 흑백의 방, 보내지 않은 편지 하나가 빨갛게 깜빡입니다. 화면을 누를 때마다 한 줄씩 찍히는 편지는 모니터에서 벽으로, 창밖의 별밤으로 번져 가고, 마침내 방은 그림이 됩니다. 별이 빛나는 밤 속에서 편지를 다 읽고 접은 어른이 호수를 내려다보면, 물속에서 그 아이가 손을 흔듭니다. 내 이야기를 하는 것 같지만, 사실은 네가 없으면 성립하지 않는 나에 대한 편지입니다.</p>
     </div>
+    <div class="strip">
+      <img src="img/b0.jpg" alt="어두운 방에서 코딩하는 사람">
+      <img src="img/b9.jpg" alt="창이 별이 빛나는 밤으로 열림">
+      <img src="img/b13.jpg" alt="호수 속에서 손을 흔드는 아이">
+    </div>
+  </div>
+  <div class="foot">
+    <span>원고는 2026년 3월 에세이 「낮에도 별은 빛나니까」를 편지로 고쳐 썼습니다.</span>
+    <span style="text-align:right;white-space:nowrap"><b>작품 보기</b><br>bemyvendelime.github.io/starry-night-by-day</span>
+  </div>
+</section>
 
+<section class="page">
+  <div class="p2 pad">
     <div>
       <h2>장면<span class="en">SCENES</span></h2>
       <div class="grid">
         <div class="shot"><img src="img/b1.jpg" alt=""><div class="c"><span class="n">02</span>흑백 코딩 창, 왼쪽 위 빨간 알림 하나: 보내지 않은 편지</div></div>
         <div class="shot"><img src="img/b5.jpg" alt=""><div class="c"><span class="n">06</span>편지는 모니터를 넘어 방의 벽에 놓입니다</div></div>
-        <div class="shot"><img src="img/b9.jpg" alt=""><div class="c"><span class="n">10</span>"그 처음에 네가 있었어." 창이 별밤으로 열립니다</div></div>
+        <div class="shot"><img src="img/b9.jpg" alt=""><div class="c"><span class="n">10</span>창이 별밤으로 열리고, 창틀의 아이패드가 같은 그림으로 켜집니다</div></div>
         <div class="shot"><img src="img/b10.jpg" alt=""><div class="c"><span class="n">11</span>창 속으로 들어가 그림 안에 섭니다</div></div>
         <div class="shot"><img src="img/b12.jpg" alt=""><div class="c"><span class="n">13</span>편지를 다 읽고 접어 품에 넣는 어른</div></div>
         <div class="shot"><img src="img/b13.jpg" alt=""><div class="c"><span class="n">14</span>호수를 내려다보면, 물속의 어린 내가 손을 흔듭니다</div></div>
       </div>
     </div>
-
     <div class="two">
       <div>
         <h2>인상주의와 잇는 세 가지<span class="en">LINKS</span></h2>
         <div class="rows">
-          <div class="row"><span class="k red">빨강</span><span>흑백 화면 속 빨간 알림 하나. 모네 「인상, 해돋이」(1872)의 해는 흑백으로 바꾸면 거의 사라집니다. 밝기가 아니라 색으로만 있는 빛, 인상주의가 처음 붙잡은 것을 첫 장면에 두었습니다.</span></div>
-          <div class="row"><span class="k">낮의 별</span><span>고흐는 이 밤하늘을 밤이 아니라 낮에 그렸습니다(MoMA). 제목 '낮에도 별은 빛나니까'가 여기서 왔습니다.</span></div>
+          <div class="row"><span class="k red">빨강</span><span>흑백 화면 속 빨간 알림 하나. 「인상, 해돋이」의 해처럼, 밝기가 아니라 색으로만 있는 빛을 첫 장면에 두었습니다.</span></div>
+          <div class="row"><span class="k">낮의 별</span><span>고흐는 이 밤하늘을 밤이 아니라 낮에 그렸습니다(MoMA). 제목이 여기서 왔습니다.</span></div>
           <div class="row"><span class="k">물의 반영</span><span>모네는 생애 마지막 30여 년 동안 연못을 내려다보며 물에 비친 하늘을 그렸습니다(「수련」 연작 약 250점). 마지막 장면의 호수가 그 자리입니다.</span></div>
         </div>
       </div>
@@ -126,13 +166,13 @@ p { margin: 0; font: 300 9.6pt/1.75 var(--ko); }
           <div class="row"><span class="k">웹</span><span>three.js로 직접 만든 작품입니다. 설치 없이 브라우저에서 열립니다.</span></div>
           <div class="row"><span class="k">흑백</span><span>방 전체를 펜 해칭 셰이더로 그렸습니다. 빛의 세기가 선의 굵기가 됩니다.</span></div>
           <div class="row"><span class="k">편지</span><span>글자를 모니터와 벽의 표면에 직접 써 넣어, 종이 편지가 튀어나오지 않고 방 안에서 읽히게 했습니다.</span></div>
-          <div class="row"><span class="k">소리</span><span>파일 없이 만든 합성음입니다. 창이 열리면 한 글자에 한 음씩 울립니다.</span></div>
+          <div class="row"><span class="k">사람</span><span>뼈대가 있는 3D 인물을 IK로 직접 자세 잡았습니다. 앉아서 타이핑하고, 편지를 접고, 물속에서 손을 흔듭니다.</span></div>
         </div>
       </div>
     </div>
   </div>
   <div class="foot">
-    <span>그림: 빈센트 반 고흐, 「별이 빛나는 밤」, 1889, 뉴욕 현대미술관(MoMA) 소장. 퍼블릭 도메인 이미지(Google Art Project, Wikimedia Commons).<br>원고: 허대훈, 2026년 3월 에세이 「낮에도 별은 빛나니까」를 편지로 고쳐 씀.</span>
+    <span>그림: 빈센트 반 고흐, 「별이 빛나는 밤」, 1889, 뉴욕 현대미술관(MoMA) 소장. 퍼블릭 도메인 이미지(Google Art Project, Wikimedia Commons).<br>%%MODEL_CREDIT%%</span>
     <span style="text-align:right;white-space:nowrap"><b>작품 보기</b><br>bemyvendelime.github.io/starry-night-by-day</span>
   </div>
 </section>

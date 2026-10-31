@@ -28,9 +28,8 @@ def run(cmd):
     return subprocess.run(cmd, cwd=ROOT, check=True, capture_output=True, text=True, encoding="utf-8", shell=True).stdout
 
 
-# 1. one JS bundle; three.js stays on the CDN through the import map
-run('npx -y esbuild@0.24.0 src/js/main.js --bundle --format=esm --external:three "--external:three/addons/*" '
-    '--charset=utf8 --legal-comments=none --outfile=build/bundle.js --log-level=warning')
+# 1. one JS bundle; three.js itself stays on the CDN (import map), its addons (GLTF loader...) come from node_modules
+run("node bundle.mjs")
 bundle = (BUILD / "bundle.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
 
 # 2. the letter as plain text, for readers without JavaScript (read straight from content/*.js)
@@ -67,8 +66,7 @@ page = page.replace('<link rel="stylesheet" href="style.css">', "<style>\n" + cs
 page = page.replace('<script type="module" src="js/main.js"></script>', '<script type="module">\n' + bundle + "</script>")
 page = page.replace("%%NOSCRIPT%%", noscript)
 (DOCS / "index.html").write_text(page, encoding="utf-8")
-for f in (SRC / "assets").iterdir():
-    shutil.copy2(f, DOCS / "assets" / f.name)
+shutil.copytree(SRC / "assets", DOCS / "assets", dirs_exist_ok=True)
 (DOCS / ".nojekyll").write_text("", encoding="utf-8")
 
 # 4. the Artifact fragment: what sits between the HEAD and BODY markers, painting inlined

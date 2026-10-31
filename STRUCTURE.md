@@ -1,4 +1,4 @@
-# 코드 구조 (갱신 2026-11-01, v1 모듈판)
+# 코드 구조 (갱신 2026-11-01, v2: 뼈대 인물·소품·자동 빌드)
 
 ```
 sian/
@@ -7,6 +7,7 @@ sian/
     style.css                 색 토큰·글꼴·자막·카드·막대·DEV 상자
     assets/starry.jpg         별이 빛나는 밤 1024px (퍼블릭 도메인)
     assets/og.jpg             링크 미리보기 그림
+    assets/models/            사람 모델(person.glb)과 출처(CREDITS.json)
     js/
       content/letter.js       ✏️ 원고: LINES(편지 줄·망설임), ENDING(카드), SCREEN·CODE(모니터), HINTS, OPENING
       content/beats.js        ✏️ 장면 순서표 BEATS (15장면)
@@ -20,18 +21,23 @@ sian/
       gfx/shaders.js          GLSL: 해칭·그림·수면·붓질·별·전체 화면
       gfx/kit.js              hatch()·skyMat()·box()·limb()·headOn()·textPlane()·wrap()
       gfx/painting.js         그림 텍스처
+      gfx/rig.js              뼈 이름 찾기(findBones), 2관절 IK(reach), 월드 축 회전(turn)
       world/room.js           방 전체, 모니터 캔버스, 벽 글자판
-      world/lake.js           별밤 속 호숫가, 편지 든 어른, 편지 접기(fold), 붓질·별
+      world/lake.js           별밤 속 호숫가, 편지 자리(placeReader), 편지 접기(fold)와 손이 편지를 따라감, 붓질·별
+      world/people.js         glTF 인물 불러와 복제(makePerson), 머리카락, 자세: 앉기·편지 읽기·올려다보기·손 흔들기
       ui/screen.js            모니터 화면 그리기
       ui/walls.js             벽 글씨 그리기
-      ui/overlay.js           그림 확대·내려다본 호수, 어른/손 흔드는 아이 마스크
+      ui/overlay.js           그림 확대·내려다본 호수, 물속 어른·아이를 따로 렌더(2:1 렌더 타깃)해 물에 깖
       ui/dom.js               HTML 요소, 3D 위치에 붙이기(place), 글 판
       audio/sound.js          WebAudio 합성음
       director.js             applyBeat(장면 지휘), next/prev, sendLetter
       input.js                탭·키·휠·스와이프·버튼
       dev.js                  ?dev 시점 조정 도구
       main.js                 시작·로딩·프레임 루프
-  build.py                    esbuild 로 묶어 docs/index.html(배포) + build/starry-letter.html(아티팩트)
+  bundle.mjs                  esbuild 설정: three 본체만 CDN, 애드온(GLTFLoader 등)은 node_modules 에서 묶음
+  build.py                    bundle.mjs 로 묶어 docs/index.html(배포) + build/starry-letter.html(아티팩트)
+  .github/workflows/build.yml src/ 가 바뀐 푸시마다 build.py 를 돌려 docs/ 를 다시 커밋 (github.com 에서 바로 고쳐도 반영)
+  notes/                      장면별 원고·배포 문서 생성기 (구글 문서로 올림)
   deploy.py                   build → git commit → push (GitHub Pages: main /docs)
   docs/                       배포본 (손으로 고치지 않음)
   pdf/                        제출용 PDF 원본·빌더

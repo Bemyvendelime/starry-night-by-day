@@ -23,6 +23,20 @@ export const LOOK = {
     stars: 9, // 앞쪽에 떠 있는 큰 별 수
   },
 
+  // 사람 모델 (뼈대가 있는 glTF 하나를 복제해 씀. 바꾸면 world/people.js 가 뼈 이름을 찾아 자세를 다시 잡음)
+  people: {
+    model: "assets/models/person.glb",
+    idleClip: "idle", // 서 있는 기본 자세를 가져올 애니메이션 이름 (없으면 모델의 기본 자세)
+    idleTime: 0.5,
+    hair: true, // 머리카락이 없는 마네킹 모델이면 머리뼈에 머리카락을 붙임 (머리카락이 있는 모델이면 false)
+    hairFit: { size: 0.66, lift: 0.62 }, // 머리 크기에 대한 머리카락 반지름·높이 비율 (주소에 ?hairdebug 를 붙이면 빨갛게 보임)
+    adultHeight: 1.72, // 어른 키(m)
+    childHeight: 1.2, // 아이 키(m)
+    childHeadScale: 1.2, // 아이 머리를 몸에 비해 크게
+    // 물속 인물 화면: 머리에서 drop(m) 아래를 가운데로, 위아래 half(m) 만큼, tilt(라디안) 위에서 내려다봄
+    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.45 }, child: { drop: 0.08, half: 0.3, tilt: 0.45 } },
+  },
+
   // 물에 비친 아이
   childGlow: 0.85, // 아이 둘레의 따뜻한 빛
   waveSpeed: 7.0, // 손 흔드는 빠르기

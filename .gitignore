@@ -11,3 +11,6 @@ pdf/_p1.png
 pdf/img/raw_*.png
 pdf/img/contact.png
 pdf/qr.svg
+node_modules/
+pdf/_pages.png
+notes/*_upload.html

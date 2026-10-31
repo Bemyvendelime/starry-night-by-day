@@ -3,7 +3,8 @@
 import * as THREE from "three";
 import { scene } from "../core/renderer.js";
 import { U } from "../core/uniforms.js";
-import { hatch, skyMat, box, limb, headOn } from "../gfx/kit.js";
+import { hatch, skyMat, box } from "../gfx/kit.js";
+import { axes, poseReader } from "./people.js";
 import { paintTex, IMG_ASPECT } from "../gfx/painting.js";
 import { HATCH_V, WATER_F, STROKE_V, STROKE_F, STAR_V, STAR_F } from "../gfx/shaders.js";
 import { LOOK } from "../content/look.js";
@@ -16,7 +17,7 @@ lake.position.set(L.x, 0, 0);
 scene.add(lake);
 
 const bankMat = hatch({ base: 0.05, seed: 6, sp: 0.05 });
-const adultMat = hatch({ rim: 1.6, base: 0.0, seed: 7, sp: 0.018, gain: 0.3 });
+export const adultMat = hatch({ rim: 1.6, base: 0.0, seed: 7, sp: 0.018, gain: 0.3 });
 
 // the bank, a few stones at the water's edge
 box(L.backdropWidth, 0.3, 4.4, 0, 0, 2.25, bankMat, lake, false);
@@ -47,38 +48,11 @@ water.rotation.x = -Math.PI / 2;
 water.position.set(0, 0, -7.95);
 lake.add(water);
 
-// the grown-up, seen from behind, holding the letter in both hands
-const adult = new THREE.Group();
-adult.position.set(0, 0.15, 0.35);
-lake.add(adult);
-for (const s of [-1, 1]) {
-  limb(adult, [0.1 * s, 0.95, 0], [0.1 * s, 0.52, -0.03], 0.068, adultMat);
-  limb(adult, [0.1 * s, 0.52, -0.03], [0.1 * s, 0.09, 0], 0.055, adultMat);
-  const foot = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.06, 0.24), adultMat);
-  foot.position.set(0.1 * s, 0.03, -0.06);
-  adult.add(foot);
-}
-limb(adult, [-0.12, 0.97, 0], [0.12, 0.97, 0], 0.12, adultMat);
-limb(adult, [0, 1.02, 0], [0, 1.4, -0.04], 0.16, adultMat);
-limb(adult, [-0.19, 1.45, -0.04], [0.19, 1.45, -0.04], 0.075, adultMat);
-limb(adult, [0, 1.48, -0.05], [0, 1.57, -0.07], 0.05, adultMat);
-// arms up, holding the letter at face height; each arm turns at the shoulder to lower the folded letter
-function arm(shoulder, elbow, hand) {
-  const g = new THREE.Group();
-  g.position.set(...shoulder);
-  limb(g, [0, 0, 0], elbow, 0.055, adultMat);
-  limb(g, elbow, hand, 0.045, adultMat);
-  const h = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 10), adultMat);
-  h.position.set(hand[0], hand[1] + 0.02, hand[2] - 0.01);
-  g.add(h);
-  adult.add(g);
-  return g;
-}
-const armR = arm([0.2, 1.44, -0.03], [0.1, -0.08, -0.21], [0.11, 0.2, -0.34]);
-const armL = arm([-0.2, 1.44, -0.03], [0.02, -0.1, -0.21], [0.25, 0.18, -0.34]);
-const ARM_DOWN = -0.9;
-headOn(adult, [0, 1.57, -0.07], adultMat, -0.38);
-export const ADULT_HEAD = new THREE.Vector3(L.x + 0.35, 2.05, 0.3);
+// the grown-up, seen from behind: a rigged person from world/people.js, put here by placeReader()
+export const ADULT_HEAD = new THREE.Vector3(L.x + 0.35, 2.05, 0.3); // where the caption beside the person sits
+const ADULT_AT = new THREE.Vector3(0, 0.15, 0.35); // feet, lake-local
+let reader = null;
+const UP = new THREE.Vector3(0, 1, 0);
 
 /* ---------- the letter, folded twice: top half down, then the right half over ---------- */
 const PW = 0.26, PH = 0.36;
@@ -113,7 +87,7 @@ function quad(u0, v0, u1, v1) {
   return new THREE.Mesh(g, paperMat);
 }
 const paper = new THREE.Group();
-adult.add(paper);
+lake.add(paper);
 const leftHalf = new THREE.Group(), topL = new THREE.Group(), rightPivot = new THREE.Group(), topR = new THREE.Group();
 paper.add(leftHalf, rightPivot);
 const BL = quad(0, 0, 0.5, 0.5); BL.position.set(-PW / 4, -PH / 4, 0);
@@ -125,15 +99,47 @@ rightPivot.add(BR, topR); topR.add(TR);
 
 // f1: top half folded down · f2: right half folded over · tuck: held against the chest
 export const fold = { f1: 0, f2: 0, tuck: 0 };
-const OPEN = { p: new THREE.Vector3(0.18, 1.74, -0.4), rx: -0.12 };
-const HELD = { p: new THREE.Vector3(0.18, 1.31, -0.43), rx: -1.02 };
-function applyFold() {
+const OPEN = { p: new THREE.Vector3(0.18, 1.7, -0.05), q: new THREE.Quaternion() };
+const HELD = { p: new THREE.Vector3(0.1, 1.3, -0.05), q: new THREE.Quaternion() };
+
+export function placeReader(p) {
+  reader = p;
+  p.root.rotation.y = Math.PI; // facing the water (-z)
+  p.root.position.copy(ADULT_AT);
+  lake.add(p.root);
+  lake.updateMatrixWorld(true);
+  // where the letter is held, taken from the person's own bones: before the face to read, against the chest once folded
+  const ax = axes(p);
+  const head = p.bones.head.getWorldPosition(new THREE.Vector3());
+  const chest = (p.bones.chest || p.bones.spine).getWorldPosition(new THREE.Vector3());
+  const eyes = head.clone().addScaledVector(ax.fwd, 0.09);
+  const dummy = new THREE.Object3D();
+  lake.add(dummy);
+  dummy.position.copy(lake.worldToLocal(head.clone().addScaledVector(ax.right, 0.12).addScaledVector(UP, -0.12).addScaledVector(ax.fwd, 0.36)));
+  dummy.lookAt(eyes);
+  OPEN.p.copy(dummy.position); OPEN.q.copy(dummy.quaternion);
+  const held = chest.clone().addScaledVector(ax.right, 0.05).addScaledVector(UP, -0.03).addScaledVector(ax.fwd, 0.25);
+  dummy.position.copy(lake.worldToLocal(held.clone()));
+  dummy.lookAt(held.clone().addScaledVector(UP, 1).addScaledVector(ax.fwd, -0.7));
+  HELD.p.copy(dummy.position); HELD.q.copy(dummy.quaternion);
+  lake.remove(dummy);
+  ADULT_HEAD.copy(head).addScaledVector(ax.right, 0.4).addScaledVector(UP, 0.25);
+}
+
+const _q = new THREE.Quaternion(), _c = new THREE.Vector3();
+function applyFold(posePerson) {
   topL.rotation.x = topR.rotation.x = fold.f1 * (Math.PI - 0.04);
   rightPivot.rotation.y = -fold.f2 * (Math.PI - 0.08);
   rightPivot.position.z = fold.f2 * 0.004;
-  armR.rotation.x = armL.rotation.x = ARM_DOWN * fold.tuck;
   paper.position.lerpVectors(OPEN.p, HELD.p, fold.tuck);
-  paper.rotation.x = OPEN.rx + (HELD.rx - OPEN.rx) * fold.tuck;
+  paper.quaternion.slerpQuaternions(OPEN.q, HELD.q, fold.tuck);
+  if (!reader || !posePerson) return;
+  // the hands hold the two side edges of whatever is left of the sheet after folding
+  paper.updateMatrixWorld(true);
+  paper.getWorldQuaternion(_q);
+  const r = new THREE.Vector3(1, 0, 0).applyQuaternion(_q), u = new THREE.Vector3(0, 1, 0).applyQuaternion(_q);
+  paper.getWorldPosition(_c).addScaledVector(r, -fold.f2 * PW / 4).addScaledVector(u, -fold.f1 * PH / 4);
+  poseReader(reader, _c, r, u, (PW / 2) * (1 - 0.5 * fold.f2) - 0.01);
 }
 
 /* ---------- brush strokes going round the swirls, and big ringed stars ---------- */
@@ -185,8 +191,8 @@ lake.add(stars);
 // pixels per metre at distance 1, so strokes keep their size as the camera moves
 export function setPointScale(px) { strokeMat.uniforms.uPx.value = px; starMat.uniforms.uPx.value = px; }
 
-export function updateLake(t, motion) {
-  applyFold();
+export function updateLake(t, motion, visible) {
+  applyFold(visible);
   strokeMat.uniforms.uTime.value = t * motion;
   starMat.uniforms.uTime.value = t * motion;
   waterMat.uniforms.uTime.value = t * motion;
