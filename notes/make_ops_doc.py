@@ -54,9 +54,9 @@ out.append(table(["무엇", "어디", "메모"], [
     ["공개 작품", a(SITE), "제출에 쓰는 주소. 휴대폰에서도 열림"],
     ["코드 저장소", a(REPO), "공개 저장소. 고치는 곳은 src/js/content/"],
     ["로컬 폴더", "C:\\Users\\hdh59\\projects\\jisikhyangyeon\\sian", "같은 저장소의 내 PC 사본"],
-    ["제출 PDF", "드라이브 projects/jisikhyangyeon/제출/낮에도별은빛나니까_허대훈.pdf", "A4 2쪽, 링크와 QR"],
-    ["장면별 원고", "드라이브 projects/jisikhyangyeon/ 의 '장면별 원고' 문서", "구간마다 내 멘트를 쓰는 표"],
-    ["레퍼런스 모음", "드라이브 projects/jisikhyangyeon/ 의 '레퍼런스' 문서와 갤러리 페이지", "실제로 열리는 비슷한 작품들"],
+    ["제출 PDF", "드라이브 projects/jisikhyangyeon/제출/허대훈(아이디)_낮에도 별은 빛나니까.pdf", "A4 3쪽: 표지·키워드·링크·QR / 키워드 해석·문제의식·결론 / 장면·인상주의·만든 방법. '아이디'를 실제 ID로"],
+    ["장면별 원고", a("https://docs.google.com/document/d/1FNBjfcaMQIItvKdO7fQRk7hmPy7rwWRnZE_z0Jx1Bgw/edit", "장면별 원고 (구글 문서)"), "구간마다 내 멘트·발표 멘트를 쓰는 표"],
+    ["레퍼런스 모음", a("https://claude.ai/artifact/HoXxXhDDkyyvnsudKD16Qi", "레퍼런스 갤러리 52") + " · 드라이브 projects/jisikhyangyeon/레퍼런스/", "실제로 열리는 비슷한 작품들과 공모 요강"],
     ["비공개 미리보기", a("https://claude.ai/artifact/FVzwqmRJAb839TsTL6mEiT"), "claude.ai 아티팩트. 본인만 열림, 제출용 아님"],
     ["기획 페이지", a("https://claude.ai/artifact/MYSz6xrvRMyMAPNtHmK4yk"), "기획·검증·제출 탭"],
 ]))
@@ -82,7 +82,7 @@ out.append(table(["방법", "순서", "언제 좋은가"], [
 out.append("<p>어느 파일의 어느 칸을 고치는지는 저장소의 EDITING.md(드라이브 sian/수정가이드-EDITING.md)에 표로 있습니다. 카메라 시점은 주소 끝에 ?dev 를 붙여 자유 시점으로 맞춘 뒤 '이 시점 복사'로 한 줄을 받아 cameras.js 에 붙입니다. 장면 하나를 바로 열려면 주소 끝에 #beat-번호(0부터)를 붙입니다.</p>")
 
 out.append("<h2>제출 PDF</h2>")
-out.append("<p>sian/pdf/submission.html 이 원본이고, python pdf/make_pdf.py 로 다시 뽑습니다. 1쪽은 표지·링크·QR·감상 방법, 2쪽은 작품 소개·장면 6컷·인상주의와 잇는 세 가지·만든 방법입니다. "
+out.append("<p>sian/pdf/submission.html 이 원본이고, python pdf/make_pdf.py 로 다시 뽑습니다. 1쪽은 표지·키워드·링크·QR·감상 방법, 2쪽은 키워드 해석·문제의식·결론·작품 소개, 3쪽은 장면 6컷·인상주의와 잇는 세 가지·만든 방법입니다. 파일 이름은 요강 규칙대로 '이름(홈페이지 ID)_제목'이고, make_pdf.py 의 out 줄에서 아이디를 바꿉니다. "
            "장면 사진은 pdf/img/ 에 있고, 바꾸려면 주소에 ?shot=1#beat-번호 를 붙여 연 화면(아래 막대 없음)을 캡처해 같은 이름으로 넣습니다. QR 은 공개 주소를 가리킵니다.</p>")
 
 out.append("<h2>라이선스와 출처</h2>")
@@ -114,7 +114,8 @@ out.append(table(["확인", "방법", "상태"], [
     ["PC 에서 처음부터 끝까지", "크롬으로 공개 주소를 열고 소리 켜고 15장면 끝까지, 마지막 보내기까지", "TODO: 직접 확인"],
     ["휴대폰에서 QR", "PDF 1쪽 QR 을 폰 카메라로 비춰 열리는지", "TODO: 직접 확인"],
     ["PDF 링크", "PDF 를 열어 링크를 눌러 열리는지", "TODO: 직접 확인"],
-    ["접수 양식", "링크 칸이 있는지, 파일 형식·용량, 마감 시각", "미확인(검색으로 못 찾음)"],
+    ["파일명·메일", "PDF 이름의 '아이디'를 지식향연 홈페이지 ID로 바꾸고, 위 메일 초안으로 hellossghero@gmail.com 에 보내기", "TODO: 홈페이지 ID 필요"],
+    ["마감", "2026. 11. 1 (일) 23:59", "오늘 밤"],
     ["문장 최종본", "장면별 원고 문서의 내 멘트 반영", "TODO"],
 ]))
 doc = "<html><head><meta charset=\"utf-8\"></head><body>" + "\n".join(out) + "</body></html>"
