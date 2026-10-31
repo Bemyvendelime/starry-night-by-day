@@ -94,6 +94,6 @@ function frame(ts) {
   applyBeat(m ? Number(m[1]) : 0, false);
   requestAnimationFrame((ts) => { last = ts; frame(ts); });
   setLoader(1);
-  if (new URLSearchParams(location.search).has("shot")) el.loader.remove(); // still screenshots in tests
+  if (new URLSearchParams(location.search).has("shot")) { el.loader.remove(); document.body.classList.add("shot"); } // still screenshots in tests
   else setTimeout(() => el.loader.classList.add("done"), 250);
 })();

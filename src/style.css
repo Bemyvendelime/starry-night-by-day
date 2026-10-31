@@ -91,3 +91,4 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 .dev select, .dev textarea, .dev button { font: 400 12px var(--f-ko); color: var(--chalk); background: #1b1b20; border: 1px solid var(--hair); border-radius: 6px; padding: 5px 6px; }
 .dev textarea { width: 100%; box-sizing: border-box; resize: vertical; font-family: ui-monospace, monospace; }
 .dev #devRead { font-family: ui-monospace, monospace; color: var(--ash); }
+.shot .bar { display: none; }

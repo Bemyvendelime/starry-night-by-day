@@ -5,3 +5,9 @@ site/
 /assets/
 __pycache__/
 *.bak.html
+pdf/_print.html
+pdf/_preview.png
+pdf/_p1.png
+pdf/img/raw_*.png
+pdf/img/contact.png
+pdf/qr.svg
