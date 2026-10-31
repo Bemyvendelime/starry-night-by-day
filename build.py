@@ -9,6 +9,7 @@ Outputs
 src/ also runs as it is, without building: serve src/ (python -m http.server) and open index.html.
 """
 import base64
+import re
 import html
 import json
 import pathlib
@@ -78,6 +79,10 @@ def between(s, a, b):
 b64 = base64.b64encode((SRC / "assets/starry.jpg").read_bytes()).decode()
 frag = between(page, "<!--HEAD-->", "<!--/HEAD-->") + between(page, "<!--BODY-->", "<!--/BODY-->")
 frag = frag.replace('src="assets/starry.jpg"', 'src="data:image/jpeg;base64,' + b64 + '"')
+# the Artifact viewer gets plain CDN imports instead of the import map
+THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+frag = re.sub(r'<script type="importmap">.*?</script>\n?', "", frag, flags=re.S)
+frag = re.sub(r'from\s*"three"', f'from "{THREE_URL}"', frag)
 (BUILD / "starry-letter.html").write_text(frag, encoding="utf-8")
 
 for p in ("docs/index.html", "build/starry-letter.html"):
