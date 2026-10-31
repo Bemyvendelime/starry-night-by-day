@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--HEAD-->
+<title>낮에도 별은 빛나니까</title>
+<meta name="description" content="어두운 방, 흑백 코딩 창의 빨간 알림 하나에서 시작해 어린 나에게 쓰는 편지가 「별이 빛나는 밤」으로 이어지는 인터랙티브 작품. 신세계 지식향연 2026.">
+<meta property="og:title" content="낮에도 별은 빛나니까">
+<meta property="og:description" content="어린 나에게 쓰는 편지, 그리고 별이 빛나는 밤. 화면을 눌러 한 줄씩 읽어 주세요.">
+<meta property="og:image" content="https://bemyvendelime.github.io/starry-night-by-day/assets/og.jpg">
+<meta name="theme-color" content="#060607">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Gaegu&family=Jost:wght@300;400;500&family=Nanum+Gothic+Coding&family=Noto+Sans+KR:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<!--/HEAD-->
+</head>
+<body>
+<!--BODY-->
+<canvas id="gl" aria-label="어두운 방에서 코딩하는 사람. 화면을 누르면 다음 장면으로 넘어갑니다."></canvas>
+<div id="vig"></div>
+<div id="grain"></div>
+<div id="hint" class="hint" aria-hidden="true"><span class="ring"></span><span class="txt"></span></div>
+<div id="cap" class="cap low" hidden></div>
+<div id="anchor" class="anchor" hidden></div>
+
+<section id="card" class="card" hidden aria-label="편지 쓰기 창">
+  <div class="row"><span>받는 사람</span><span id="to" class="to"></span></div>
+  <div class="row"><span>제목</span><span id="subj" class="subj"></span></div>
+  <p id="cardNote"></p>
+  <div class="actions"><span id="cardFooter"></span><button id="send" class="send" type="button" disabled>보내기</button></div>
+</section>
+
+<section id="fin" class="fin" hidden>
+  <div>
+    <h1>낮에도 별은 빛나니까</h1>
+    <div class="by">허대훈 · 신세계 지식향연 2026 「예술을 바꾼 혁명, 인상주의」</div>
+    <div class="credit">빈센트 반 고흐, 「별이 빛나는 밤」, 1889, 뉴욕 현대미술관(MoMA) 소장. 이미지: Google Art Project, Wikimedia Commons(퍼블릭 도메인).</div>
+    <div class="btns"><button id="again" type="button">처음부터</button><button id="replay" type="button">별밤 속으로 돌아가기</button></div>
+  </div>
+</section>
+
+<nav class="bar" id="bar" aria-label="장면 이동">
+  <button id="prev" type="button" aria-label="이전 장면"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <div class="label" aria-live="off"><span class="num" id="num">01 / 15</span><span class="t" id="lab">어두운 방</span></div>
+  <button id="next" type="button" aria-label="다음 장면"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <span class="sep"></span>
+  <button id="snd" type="button" aria-label="소리" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button>
+  <button id="still" type="button" aria-label="움직임 줄이기" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/></svg></button>
+  <button id="infoBtn" type="button" aria-label="작품 정보" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+</nav>
+
+<aside id="info" class="info" hidden>
+  <h2>HOW TO READ</h2>
+  <dl>
+    <dt>넘기기</dt><dd>화면을 누르거나 스페이스·→. 이전 장면은 ←. 글이 찍히는 중에 누르면 그 줄을 끝까지 보여 줍니다.</dd>
+    <dt>소리</dt><dd>켜 두기를 권합니다. 타건음이 어느 순간 음악이 됩니다.</dd>
+    <dt>시간</dt><dd>15장면, 3~4분.</dd>
+    <dt>그림</dt><dd>빈센트 반 고흐, 「별이 빛나는 밤」(1889, MoMA). 퍼블릭 도메인 이미지.</dd>
+  </dl>
+</aside>
+
+<div id="loader"><div class="in"><div class="dot"></div><div class="t">낮에도 별은 빛나니까</div><div class="b"><i></i></div></div></div>
+
+<main id="a11y" class="sr" aria-label="글로 읽는 판"></main>
+<div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
+
+<noscript><div class="text">%%NOSCRIPT%%</div></noscript>
+
+<img id="starryImg" hidden alt="빈센트 반 고흐, 별이 빛나는 밤, 1889" src="assets/starry.jpg">
+
+<script type="module" src="js/main.js"></script>
+<!--/BODY-->
+</body>
+</html>

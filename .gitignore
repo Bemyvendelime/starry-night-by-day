@@ -1,0 +1,7 @@
+shots/
+build/
+_v0/
+site/
+/assets/
+__pycache__/
+*.bak.html
