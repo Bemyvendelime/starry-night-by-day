@@ -1970,7 +1970,11 @@ function drawIpad(img) {
   x.fillText("10월 31일 토요일", W / 2, 44);
   ipadTex.needsUpdate = true;
 }
-function updateRoom(t, motion, posePerson) {
+var HAND_REST = { L: SIT_TARGETS.handL.clone(), R: SIT_TARGETS.handR.clone() };
+function updateRoom(t, motion, posePerson, typing) {
+  const tap = (phase2) => typing && motion ? Math.max(0, Math.sin(t * 17 + phase2)) * 0.014 : 0;
+  SIT_TARGETS.handL.copy(HAND_REST.L).y += tap(0);
+  SIT_TARGETS.handR.copy(HAND_REST.R).y += tap(Math.PI * 0.9);
   if (seated && posePerson) posePerson(seated, SIT_TARGETS, { yaw: sitHead.rotation.y, pitch: sitHead.rotation.x });
   winSky.uniforms.uTime.value = t * motion;
   winSky.uniforms.uMotion.value = motion;
@@ -5694,7 +5698,7 @@ function frame(ts) {
   U.uCam.value.copy(camera.position);
   U.uMonI.value = G.world === "lake" ? 0 : LOOK.monitorPower * (1 + Math.sin(t * 7.3) * LOOK.monitorFlicker * 0.6 + Math.sin(t * 1.7) * LOOK.monitorFlicker);
   setPointScale(innerHeight * renderer.getPixelRatio() / (2 * Math.tan(THREE13.MathUtils.degToRad(camera.fov / 2))));
-  updateRoom(t, motion, G.world !== "lake" ? poseSitter : null);
+  updateRoom(t, motion, G.world !== "lake" ? poseSitter : null, S.typing && BEATS[G.k].compose);
   updateLake(t, motion, G.world === "lake");
   updateOverlay(t, motion, renderer);
   if (G.dropT >= 0) {

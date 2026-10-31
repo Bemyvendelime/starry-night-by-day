@@ -47,7 +47,7 @@ function frame(ts) {
   U.uMonI.value = G.world === "lake" ? 0 : LOOK.monitorPower * (1 + Math.sin(t * 7.3) * LOOK.monitorFlicker * 0.6 + Math.sin(t * 1.7) * LOOK.monitorFlicker);
   setPointScale((innerHeight * renderer.getPixelRatio()) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))));
 
-  updateRoom(t, motion, G.world !== "lake" ? poseSitter : null);
+  updateRoom(t, motion, G.world !== "lake" ? poseSitter : null, S.typing && BEATS[G.k].compose);
   updateLake(t, motion, G.world === "lake");
   updateOverlay(t, motion, renderer);
   if (G.dropT >= 0) { G.dropT += dt; ovU.uDrop.value = G.dropT; if (G.dropT > 9) { G.dropT = -1; ovU.uDrop.value = -1; } }

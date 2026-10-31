@@ -229,7 +229,12 @@ export function drawIpad(img) {
   ipadTex.needsUpdate = true;
 }
 
-export function updateRoom(t, motion, posePerson) {
+const HAND_REST = { L: SIT_TARGETS.handL.clone(), R: SIT_TARGETS.handR.clone() };
+export function updateRoom(t, motion, posePerson, typing) {
+  // while a line is being typed, the two hands tap the keys in turn
+  const tap = (phase) => (typing && motion ? Math.max(0, Math.sin(t * 17 + phase)) * 0.014 : 0);
+  SIT_TARGETS.handL.copy(HAND_REST.L).y += tap(0);
+  SIT_TARGETS.handR.copy(HAND_REST.R).y += tap(Math.PI * 0.9);
   if (seated && posePerson) posePerson(seated, SIT_TARGETS, { yaw: sitHead.rotation.y, pitch: sitHead.rotation.x });
   winSky.uniforms.uTime.value = t * motion;
   winSky.uniforms.uMotion.value = motion;
