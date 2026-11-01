@@ -20,6 +20,7 @@
 //   fold     줄이 다 찍히면 편지를 접음
 //   pov      내려다본 호수 (전체 화면)
 //   drop     물방울이 떨어지고 비친 모습이 손 흔드는 아이로 바뀜
+//   read     편지 전문을 스크롤해서 읽는 창 (letter.js 의 LETTER); 끝의 버튼을 눌러야 다음 장면
 //   end      받는 사람 카드와 보내기 버튼
 //   music    타건음이 음악으로 바뀜 · chord 화음 번호 0~3
 //   arc      카메라가 지나갈 때 휘는 정도 [x, y, z] (사람 머리를 피할 때)
@@ -36,7 +37,7 @@ export const BEATS = [
   { label: "창", cam: "window2", compose: true, line: "l7", show: "side", sky: [0.7, 0.5], head: true, music: true, chord: 1 },
   { label: "창", cam: "window3", compose: true, line: "l8", show: "side", sky: [1, 1], head: true, ipad: true, music: true, chord: 2 },
   { label: "그림 속으로", cam: "into", line: "l9", show: "cap", sky: [1, 1], head: true, paint: true, music: true, chord: 3 },
-  { label: "별밤 속", cam: "lakeBack", world: "lake", line: "l10", show: "anchor", music: true, chord: 0 },
+  { label: "별밤 속", cam: "lakeBack", world: "lake", read: true, music: true, chord: 0 },
   { label: "다 읽고", cam: "lakeFold", world: "lake", line: "last", show: "capHigh", fold: true, music: true, chord: 2 },
   { label: "내려다보면", cam: "lakeDown", world: "lake", line: "l11", show: "capHigh", pov: true, drop: true, music: true, chord: 1 },
   { label: "받는 사람", cam: "lakeDown", world: "lake", pov: true, end: true, music: true, chord: 0 },

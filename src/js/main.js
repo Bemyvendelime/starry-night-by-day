@@ -6,7 +6,7 @@ import { G, S } from "./core/state.js";
 import { clock, stepTweens, stepCam, rig, refitCam } from "./core/motion.js";
 import { finalOf, typer } from "./core/typer.js";
 import { BEATS } from "./content/beats.js";
-import { LINES, ENDING, OPENING, HINTS } from "./content/letter.js";
+import { LINES, LETTER, ENDING, OPENING, HINTS } from "./content/letter.js";
 import { LOOK } from "./content/look.js";
 import { paintReady, paintImg } from "./gfx/painting.js";
 import { updateRoom, sitter, HEAD_C, monitorWorld, badgeWorld, drawIpad, seatPerson, bodyMaterial } from "./world/room.js";
@@ -99,7 +99,7 @@ function frame(ts) {
   drawPaper();
   drawIpad(paintImg);
   makeGrain();
-  fillA11y({ BEATS, LINES, ENDING, OPENING, finalOf });
+  fillA11y({ BEATS, LINES, LETTER, ENDING, OPENING, finalOf });
   initInput();
   initDev();
   addEventListener("resize", resize);

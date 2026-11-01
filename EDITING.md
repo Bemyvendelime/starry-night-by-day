@@ -6,10 +6,12 @@
 |---|---|---|
 | 편지 문장, 망설임(지웠다 다시 쓰기) | `src/js/content/letter.js` | `LINES` 의 각 줄. `["t","글"]` 찍기, `["p",500]` 멈춤, `["d",3]` 지우기 |
 | 마지막 카드(받는 사람, 제목, 보내기) | `src/js/content/letter.js` | `ENDING` |
+| 편지 전문('별밤 속'에서 스크롤해서 읽는 창) | `src/js/content/letter.js` | `LETTER` 의 `paragraphs`(문단 하나 = 따옴표 한 쌍), `title`·`sign` 은 비우면 안 보임. `LINES` 와 따로 고침 |
 | 모니터 코딩 창의 코드, 파일 이름 | `src/js/content/letter.js` | `CODE`, `SCREEN` |
 | 손가락 안내 문구 | `src/js/content/letter.js` | `HINTS` |
 | 장면 순서, 장면 추가·삭제, 어느 장면에 어느 줄 | `src/js/content/beats.js` | `BEATS` 한 줄 = 한 장면. 칸 설명은 파일 맨 위 |
 | 글이 놓이는 자리(벽·자막·모니터) | `src/js/content/beats.js` | `show` 칸 |
+| 편지를 스크롤해서 읽는 장면 | `src/js/content/beats.js` | `read: true` 칸. 끝의 '다 읽었어요' 버튼(또는 →·Enter)을 눌러야 다음 장면, 창 안을 누르거나 굴려도 안 넘어감 |
 | 창 속 별밤이 열리는 정도와 색 | `src/js/content/beats.js` | `sky: [열림, 색]` |
 | 카메라 위치·화각 | `src/js/content/cameras.js` | `CAMERAS` (아래 '시점 맞추기' 참고) |
 | 카메라 이동 시간 | `src/js/content/cameras.js` | `MOVE` |

@@ -1,6 +1,6 @@
 // 장면 지휘: beats.js 의 한 줄을 읽어 카메라·화면·벽 글·창·호수·편지 접기·소리·카드를 맞춥니다.
 import { BEATS } from "./content/beats.js";
-import { LINES, ENDING } from "./content/letter.js";
+import { LINES, LETTER, ENDING } from "./content/letter.js";
 import { MOVE } from "./content/cameras.js";
 import { LOOK } from "./content/look.js";
 import { S, G } from "./core/state.js";
@@ -27,6 +27,18 @@ function startFold() {
   tween(fold, "tuck", 1, F.tuck, t3);
   later(() => sound.paper(), t1 * 1000);
   later(() => sound.paper(), t2 * 1000);
+}
+
+// the whole letter, read at the reader's own pace (a `read` beat): scroll, then press the button
+function openRead(anim) {
+  const r = el.read;
+  el.readTitle.textContent = LETTER.title; el.readTitle.hidden = !LETTER.title;
+  el.readSign.textContent = LETTER.sign; el.readSign.hidden = !LETTER.sign;
+  el.readBody.replaceChildren(...LETTER.paragraphs.map((t) => Object.assign(document.createElement("p"), { textContent: t })));
+  r.classList.remove("on", "scrolled"); r.classList.toggle("still", !anim);
+  r.hidden = false; r.scrollTop = 0;
+  const show = () => { r.classList.add("on"); r.focus({ preventScroll: true }); };
+  if (anim) later(show, 800); else show();
 }
 
 function showText(b, text, done, anim) {
@@ -133,6 +145,10 @@ export function applyBeat(n, animate) {
     if (anim) later(() => typer.run(ops, out, !!b.music), camDur > 0 ? Math.min(camDur * 550, 1300) : crossWorld ? 1600 : 250);
     else out(finalOf(ops), true);
   }
+
+  // the whole letter to scroll through
+  el.read.hidden = true; el.read.classList.remove("on");
+  if (b.read) openRead(anim);
 
   // the last card
   el.card.hidden = true; el.card.classList.remove("away"); el.fin.hidden = true;

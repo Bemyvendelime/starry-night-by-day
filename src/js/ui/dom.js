@@ -4,7 +4,7 @@ import { camera } from "../core/renderer.js";
 
 const $ = (s) => document.querySelector(s);
 export const el = {
-  cap: $("#cap"), anchor: $("#anchor"), hint: $("#hint"), hintTxt: $("#hint .txt"),
+  cap: $("#cap"), anchor: $("#anchor"), read: $("#read"), readTitle: $("#readTitle"), readBody: $("#readBody"), readSign: $("#readSign"), readDone: $("#readDone"), hint: $("#hint"), hintTxt: $("#hint .txt"),
   card: $("#card"), to: $("#to"), subj: $("#subj"), note: $("#cardNote"), footer: $("#cardFooter"), send: $("#send"),
   fin: $("#fin"), again: $("#again"), replay: $("#replay"),
   bar: $("#bar"), num: $("#num"), lab: $("#lab"), prev: $("#prev"), next: $("#next"), snd: $("#snd"), still: $("#still"),
@@ -30,10 +30,14 @@ export function makeGrain() {
 }
 
 // the whole letter as plain text, for screen readers
-export function fillA11y({ BEATS, LINES, ENDING, OPENING, finalOf }) {
+export function fillA11y({ BEATS, LINES, LETTER, ENDING, OPENING, finalOf }) {
   const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   let h = `<h1>${esc(ENDING.subject)}</h1><p>${esc(OPENING)}</p><ol>`;
-  for (const b of BEATS) if (b.line) h += `<li>${esc(finalOf(LINES[b.line]))}</li>`;
+  const seen = new Set();
+  for (const b of BEATS) {
+    const texts = b.line ? [finalOf(LINES[b.line])] : b.read && LETTER ? LETTER.paragraphs : [];
+    for (const t of texts) if (!seen.has(t)) { seen.add(t); h += `<li>${esc(t)}</li>`; }
+  }
   h += `</ol><p>받는 사람: ${esc(ENDING.to)}</p>`;
   el.a11y.innerHTML = h;
 }

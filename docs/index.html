@@ -43,10 +43,23 @@ body { margin: 0; background: var(--void); color: var(--chalk); font-family: var
 .hint .ring { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--chalk); animation: ring 1.8s ease-out infinite; flex: none; }
 @keyframes ring { 0%{ transform: scale(.6); opacity: 1 } 100%{ transform: scale(2.2); opacity: 0 } }
 
-.cap { position: fixed; left: 50%; transform: translateX(-50%); width: min(88vw, 760px); text-align: center; pointer-events: none; font: 300 clamp(20px, 2.6vw, 32px)/1.6 var(--f-ko); color: var(--chalk); text-wrap: balance; text-shadow: 0 2px 18px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); }
+.cap { position: fixed; left: 50%; transform: translateX(-50%); width: min(88vw, 760px); text-align: center; pointer-events: none; font: 300 clamp(20px, 2.6vw, 32px)/1.6 var(--f-ko); color: var(--chalk); text-wrap: balance; word-break: keep-all; text-shadow: 0 2px 18px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); }
 .cap.low { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .cap.high { top: calc(14vh + env(safe-area-inset-top, 0px)); }
 .anchor { position: fixed; left: 0; top: 0; width: min(62vw, 360px); pointer-events: none; font: 300 clamp(17px, 1.9vw, 22px)/1.65 var(--f-ko); color: var(--chalk); text-shadow: 0 2px 14px rgba(0,0,0,.9); transform: translate(-9999px, 0); }
+.read { position: fixed; left: 50%; top: calc(46% - 20px); transform: translate(-50%, -50%); box-sizing: border-box; width: min(34em, calc(100vw - 32px)); max-height: min(72vh, calc(100vh - 120px)); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; padding: 30px clamp(18px, 4vw, 40px) 26px; background: rgba(8, 10, 22, .58); border: 1px solid var(--hair); border-radius: 14px; backdrop-filter: blur(9px) saturate(1.1); -webkit-backdrop-filter: blur(9px) saturate(1.1); box-shadow: 0 30px 80px rgba(0,0,0,.5); font: 300 clamp(16px, 1.25vw + 8px, 18px)/1.9 var(--f-ko); color: var(--chalk); text-shadow: 0 1px 10px rgba(0,0,0,.5); opacity: 0; transition: opacity .8s ease; outline: none; scrollbar-width: thin; scrollbar-color: rgba(233,230,223,.25) transparent; z-index: 3; }
+.read.on { opacity: 1; }
+.read.still { transition: none; }
+.read .hintTop { margin: 0 0 18px; text-align: center; font: 400 12px/1.4 var(--f-ko); letter-spacing: .08em; color: var(--ash); transition: opacity .6s; }
+.read.scrolled .hintTop { opacity: 0; }
+.read h2 { margin: 0 0 18px; font: 400 20px/1.5 var(--f-ko); }
+.read .body p { margin: 0 0 1.15em; word-break: keep-all; overflow-wrap: anywhere; }
+.read .sign { margin: 1.4em 0 0; text-align: right; color: var(--ash); }
+.read .done { display: flex; justify-content: center; margin-top: 26px; }
+.read .done button { font: 400 15px var(--f-ko); color: var(--chalk); background: rgba(255,255,255,.04); border: 1px solid rgba(233,230,223,.32); border-radius: 999px; padding: 9px 22px; cursor: pointer; }
+.read .done button:hover { background: rgba(255,255,255,.09); }
+.read .done button:focus-visible { outline: 2px solid var(--chalk); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .read, .read .hintTop { transition: none; } }
 .caret::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -0.12em; background: currentColor; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0 } }
 
@@ -121,6 +134,13 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 <div id="hint" class="hint" aria-hidden="true"><span class="ring"></span><span class="txt"></span></div>
 <div id="cap" class="cap low" hidden></div>
 <div id="anchor" class="anchor" hidden></div>
+<section id="read" class="read" hidden role="document" aria-label="편지" tabindex="-1">
+  <p class="hintTop">천천히 스크롤해서 읽어 주세요</p>
+  <h2 id="readTitle" hidden></h2>
+  <div id="readBody" class="body"></div>
+  <p id="readSign" class="sign" hidden></p>
+  <div class="done"><button id="readDone" type="button">다 읽었어요</button></div>
+</section>
 
 <section id="card" class="card" hidden aria-label="편지 쓰기 창">
   <div class="row"><span>받는 사람</span><span id="to" class="to"></span></div>
@@ -1387,7 +1407,7 @@ var BEATS = [
   { label: "창", cam: "window2", compose: true, line: "l7", show: "side", sky: [0.7, 0.5], head: true, music: true, chord: 1 },
   { label: "창", cam: "window3", compose: true, line: "l8", show: "side", sky: [1, 1], head: true, ipad: true, music: true, chord: 2 },
   { label: "그림 속으로", cam: "into", line: "l9", show: "cap", sky: [1, 1], head: true, paint: true, music: true, chord: 3 },
-  { label: "별밤 속", cam: "lakeBack", world: "lake", line: "l10", show: "anchor", music: true, chord: 0 },
+  { label: "별밤 속", cam: "lakeBack", world: "lake", read: true, music: true, chord: 0 },
   { label: "다 읽고", cam: "lakeFold", world: "lake", line: "last", show: "capHigh", fold: true, music: true, chord: 2 },
   { label: "내려다보면", cam: "lakeDown", world: "lake", line: "l11", show: "capHigh", pov: true, drop: true, music: true, chord: 1 },
   { label: "받는 사람", cam: "lakeDown", world: "lake", pov: true, end: true, music: true, chord: 0 }
@@ -1442,6 +1462,22 @@ var HINTS = {
   badgeMiss: "왼쪽 위 빨간 알림을 눌러 보세요"
 };
 var OPENING = "어두운 방, 모니터만 빛난다. 흑백 코딩 창 왼쪽 위에 빨간 알림 하나: 보내지 않은 편지 1.";
+var LETTER = {
+  title: "",
+  paragraphs: [
+    "잘 지내? 나는 오늘도 늦게까지 화면 앞이야.",
+    "요즘은 하루가 꽉 차. 열아홉 학점에 학회 하나, 동아리 넷.",
+    "이상하지. 이렇게 바쁜데 머리는 어느 때보다 맑아.",
+    "누가 뭘 제일 좋아하냐고 묻더라. 대답을 잘 못 했어.",
+    "그런데 돌아보니 배경화면도, 꿈에 나오는 방도, 내 글씨체도 전부 한 곳을 가리키고 있었어.",
+    "그 처음에 네가 있었어.",
+    "무더운 여름 미술 시간이었지. 너는 그림 한 장을 오래 들여다봤어.",
+    "그 하늘은 아직 내 화면에 떠 있어. 아이패드 배경화면으로.",
+    "고흐는 이 밤하늘을 낮에 그렸대. 낮에도 별은 빛나니까.",
+    "가끔 깊은 데서 우울이 올라와. 그것도 너한테서 온 거라면, 괜찮아."
+  ],
+  sign: ""
+};
 
 // src/js/gfx/painting.js
 import * as THREE4 from "three";
@@ -5311,6 +5347,11 @@ var $ = (s) => document.querySelector(s);
 var el = {
   cap: $("#cap"),
   anchor: $("#anchor"),
+  read: $("#read"),
+  readTitle: $("#readTitle"),
+  readBody: $("#readBody"),
+  readSign: $("#readSign"),
+  readDone: $("#readDone"),
   hint: $("#hint"),
   hintTxt: $("#hint .txt"),
   card: $("#card"),
@@ -5355,10 +5396,17 @@ function makeGrain() {
   gx.putImageData(gd, 0, 0);
   el.grain.style.backgroundImage = `url(${g2.toDataURL()})`;
 }
-function fillA11y({ BEATS: BEATS2, LINES: LINES2, ENDING: ENDING2, OPENING: OPENING2, finalOf: finalOf2 }) {
+function fillA11y({ BEATS: BEATS2, LINES: LINES2, LETTER: LETTER2, ENDING: ENDING2, OPENING: OPENING2, finalOf: finalOf2 }) {
   const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   let h = `<h1>${esc(ENDING2.subject)}</h1><p>${esc(OPENING2)}</p><ol>`;
-  for (const b of BEATS2) if (b.line) h += `<li>${esc(finalOf2(LINES2[b.line]))}</li>`;
+  const seen = /* @__PURE__ */ new Set();
+  for (const b of BEATS2) {
+    const texts = b.line ? [finalOf2(LINES2[b.line])] : b.read && LETTER2 ? LETTER2.paragraphs : [];
+    for (const t of texts) if (!seen.has(t)) {
+      seen.add(t);
+      h += `<li>${esc(t)}</li>`;
+    }
+  }
   h += `</ol><p>받는 사람: ${esc(ENDING2.to)}</p>`;
   el.a11y.innerHTML = h;
 }
@@ -5399,6 +5447,24 @@ function startFold() {
   tween(fold, "tuck", 1, F.tuck, t3);
   later(() => sound.paper(), t1 * 1e3);
   later(() => sound.paper(), t2 * 1e3);
+}
+function openRead(anim) {
+  const r = el.read;
+  el.readTitle.textContent = LETTER.title;
+  el.readTitle.hidden = !LETTER.title;
+  el.readSign.textContent = LETTER.sign;
+  el.readSign.hidden = !LETTER.sign;
+  el.readBody.replaceChildren(...LETTER.paragraphs.map((t) => Object.assign(document.createElement("p"), { textContent: t })));
+  r.classList.remove("on", "scrolled");
+  r.classList.toggle("still", !anim);
+  r.hidden = false;
+  r.scrollTop = 0;
+  const show = () => {
+    r.classList.add("on");
+    r.focus({ preventScroll: true });
+  };
+  if (anim) later(show, 800);
+  else show();
 }
 function showText(b, text, done, anim) {
   S.cur = text;
@@ -5507,6 +5573,9 @@ function applyBeat(n, animate) {
     if (anim) later(() => typer.run(ops, out2, !!b.music), camDur > 0 ? Math.min(camDur * 550, 1300) : crossWorld ? 1600 : 250);
     else out2(finalOf(ops), true);
   }
+  el.read.hidden = true;
+  el.read.classList.remove("on");
+  if (b.read) openRead(anim);
   el.card.hidden = true;
   el.card.classList.remove("away");
   el.fin.hidden = true;
@@ -5577,6 +5646,7 @@ function prev() {
 // src/js/input.js
 import * as THREE12 from "three";
 var par = { x: 0, y: 0, tx: 0, ty: 0 };
+var reading = () => !!BEATS[G.k]?.read;
 function initInput() {
   const ray = new THREE12.Raycaster();
   let down = null;
@@ -5585,7 +5655,7 @@ function initInput() {
     sound.unlock();
   });
   canvas.addEventListener("pointerup", (e) => {
-    if (!down || G.freeCam) {
+    if (!down || G.freeCam || reading()) {
       down = null;
       return;
     }
@@ -5610,7 +5680,7 @@ function initInput() {
   });
   let wheelSum = 0, wheelLock = false, wheelTimer = 0;
   addEventListener("wheel", (e) => {
-    if (G.freeCam || e.target.closest?.(".bar, .card, .info, .fin, .dev")) return;
+    if (G.freeCam || reading() || e.target.closest?.(".bar, .card, .info, .fin, .dev, .read")) return;
     clearTimeout(wheelTimer);
     wheelTimer = setTimeout(() => {
       wheelSum = 0;
@@ -5626,6 +5696,14 @@ function initInput() {
   }, { passive: true });
   addEventListener("keydown", (e) => {
     if (e.target.closest?.("button, input, textarea, select") && (e.key === " " || e.key === "Enter")) return;
+    if (reading() && [" ", "PageDown", "PageUp", "ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
+      if (!el.read.contains(document.activeElement)) {
+        e.preventDefault();
+        const h = el.read.clientHeight * 0.85, d = { " ": h, PageDown: h, PageUp: -h, ArrowDown: 60, ArrowUp: -60, Home: -1e6, End: 1e6 }[e.key];
+        el.read.scrollBy({ top: e.shiftKey && e.key === " " ? -d : d, behavior: G.still ? "auto" : "smooth" });
+      }
+      return;
+    }
     if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) {
       e.preventDefault();
       next();
@@ -5645,6 +5723,8 @@ function initInput() {
       par.ty = e.clientY / innerHeight * 2 - 1;
     }
   });
+  el.readDone.addEventListener("click", next);
+  el.read.addEventListener("scroll", () => el.read.classList.toggle("scrolled", el.read.scrollTop > 8), { passive: true });
   el.next.addEventListener("click", next);
   el.prev.addEventListener("click", prev);
   el.send.addEventListener("click", sendLetter);
@@ -5819,7 +5899,7 @@ function frame(ts) {
   drawPaper();
   drawIpad(paintImg);
   makeGrain();
-  fillA11y({ BEATS, LINES, ENDING, OPENING, finalOf });
+  fillA11y({ BEATS, LINES, LETTER, ENDING, OPENING, finalOf });
   initInput();
   initDev();
   addEventListener("resize", resize);

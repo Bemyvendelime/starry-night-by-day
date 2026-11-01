@@ -26,10 +26,23 @@ body { margin: 0; background: var(--void); color: var(--chalk); font-family: var
 .hint .ring { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--chalk); animation: ring 1.8s ease-out infinite; flex: none; }
 @keyframes ring { 0%{ transform: scale(.6); opacity: 1 } 100%{ transform: scale(2.2); opacity: 0 } }
 
-.cap { position: fixed; left: 50%; transform: translateX(-50%); width: min(88vw, 760px); text-align: center; pointer-events: none; font: 300 clamp(20px, 2.6vw, 32px)/1.6 var(--f-ko); color: var(--chalk); text-wrap: balance; text-shadow: 0 2px 18px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); }
+.cap { position: fixed; left: 50%; transform: translateX(-50%); width: min(88vw, 760px); text-align: center; pointer-events: none; font: 300 clamp(20px, 2.6vw, 32px)/1.6 var(--f-ko); color: var(--chalk); text-wrap: balance; word-break: keep-all; text-shadow: 0 2px 18px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); }
 .cap.low { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 .cap.high { top: calc(14vh + env(safe-area-inset-top, 0px)); }
 .anchor { position: fixed; left: 0; top: 0; width: min(62vw, 360px); pointer-events: none; font: 300 clamp(17px, 1.9vw, 22px)/1.65 var(--f-ko); color: var(--chalk); text-shadow: 0 2px 14px rgba(0,0,0,.9); transform: translate(-9999px, 0); }
+.read { position: fixed; left: 50%; top: calc(46% - 20px); transform: translate(-50%, -50%); box-sizing: border-box; width: min(34em, calc(100vw - 32px)); max-height: min(72vh, calc(100vh - 120px)); overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; padding: 30px clamp(18px, 4vw, 40px) 26px; background: rgba(8, 10, 22, .58); border: 1px solid var(--hair); border-radius: 14px; backdrop-filter: blur(9px) saturate(1.1); -webkit-backdrop-filter: blur(9px) saturate(1.1); box-shadow: 0 30px 80px rgba(0,0,0,.5); font: 300 clamp(16px, 1.25vw + 8px, 18px)/1.9 var(--f-ko); color: var(--chalk); text-shadow: 0 1px 10px rgba(0,0,0,.5); opacity: 0; transition: opacity .8s ease; outline: none; scrollbar-width: thin; scrollbar-color: rgba(233,230,223,.25) transparent; z-index: 3; }
+.read.on { opacity: 1; }
+.read.still { transition: none; }
+.read .hintTop { margin: 0 0 18px; text-align: center; font: 400 12px/1.4 var(--f-ko); letter-spacing: .08em; color: var(--ash); transition: opacity .6s; }
+.read.scrolled .hintTop { opacity: 0; }
+.read h2 { margin: 0 0 18px; font: 400 20px/1.5 var(--f-ko); }
+.read .body p { margin: 0 0 1.15em; word-break: keep-all; overflow-wrap: anywhere; }
+.read .sign { margin: 1.4em 0 0; text-align: right; color: var(--ash); }
+.read .done { display: flex; justify-content: center; margin-top: 26px; }
+.read .done button { font: 400 15px var(--f-ko); color: var(--chalk); background: rgba(255,255,255,.04); border: 1px solid rgba(233,230,223,.32); border-radius: 999px; padding: 9px 22px; cursor: pointer; }
+.read .done button:hover { background: rgba(255,255,255,.09); }
+.read .done button:focus-visible { outline: 2px solid var(--chalk); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .read, .read .hintTop { transition: none; } }
 .caret::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -0.12em; background: currentColor; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0 } }
 

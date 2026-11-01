@@ -38,7 +38,7 @@ beats_url = (SRC / "js/content/beats.js").as_uri()
 data = json.loads(run(
     'node --input-type=module -e "'
     f"const L = await import('{letter_url}'); const B = await import('{beats_url}');"
-    'console.log(JSON.stringify({LINES: L.LINES, ENDING: L.ENDING, OPENING: L.OPENING, BEATS: B.BEATS}))"'
+    'console.log(JSON.stringify({LINES: L.LINES, LETTER: L.LETTER || null, ENDING: L.ENDING, OPENING: L.OPENING, BEATS: B.BEATS}))"'
 ))
 
 
@@ -52,7 +52,10 @@ def final_of(ops):
     return s
 
 
-lines = [final_of(data["LINES"][b["line"]]) for b in data["BEATS"] if b.get("line")]
+lines = []
+for b in data["BEATS"]:  # a `read` beat brings the whole letter (LETTER); lines already shown are not repeated
+    texts = [final_of(data["LINES"][b["line"]])] if b.get("line") else (data["LETTER"] or {}).get("paragraphs", []) if b.get("read") else []
+    lines += [t for t in texts if t not in lines]
 noscript = (
     f"<p>{html.escape(data['ENDING']['subject'])} — 자바스크립트가 꺼져 있어 글로만 보여 드립니다.</p>"
     f"<p>{html.escape(data['OPENING'])}</p><p>" + "<br>".join(html.escape(l) for l in lines) + "</p>"
