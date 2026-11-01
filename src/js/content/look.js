@@ -35,7 +35,9 @@ export const LOOK = {
     wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.42, out: 0.1, lift: 0.05 },
     hair: false, // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
     kidHair: true, // 물속 아이: 모델의 머리카락 위에 바가지 머리(이마 위에서 수평으로 자른 둥근 머리)를 씌움
-    kidHairFit: { size: 0.54, lift: 0.38 }, // 바가지 머리 크기·높이 (머리뼈~정수리 거리에 대한 비율, ?hairdebug 로 빨갛게 확인)
+    // 바가지 머리: size·lift = 크기·높이(머리뼈~정수리 거리에 대한 비율), cut = 얼마나 내려오나(0.5 = 정수리 반구), w = 폭
+    // 주소에 ?kidhair=none(모델 원래 머리) 또는 ?kidhair=0.5,0.36,0.55,0.93 을 붙이면 다시 빌드하지 않고 비교, ?hairdebug 는 빨갛게
+    kidHairFit: { size: 0.5, lift: 0.36, cut: 0.55, w: 0.93 },
     childArmScale: 0.78, // 아이 팔 길이·굵기 (1 = 모델 그대로, 작을수록 짧고 가늘게)
     hairFit: { size: 0.66, lift: 0.62 }, // 머리 크기에 대한 머리카락 반지름·높이 비율 (주소에 ?hairdebug 를 붙이면 빨갛게 보임)
     adultHeight: 1.72, // 어른 키(m)

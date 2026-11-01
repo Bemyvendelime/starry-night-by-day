@@ -60,7 +60,12 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   const bones = findBones(body);
   root.updateMatrixWorld(true);
   // the crown is the model's top (height): its distance from the head bone sizes the hair when there is no head-top bone
-  if (kid && LOOK.people.kidHair && bones.head) addHair(bones.head, mat, true, height, LOOK.people.kidHairFit);
+  if (kid && LOOK.people.kidHair && bones.head) {
+    // ?kidhair=none (the model's own hair) or ?kidhair=size,lift,cut,width tries another cut without a rebuild
+    const q = new URLSearchParams(location.search).get("kidhair");
+    const [size, lift, cut, w] = (q || "").split(",").map(Number);
+    if (q !== "none") addHair(bones.head, mat, true, height, q ? { ...LOOK.people.kidHairFit, size, lift, cut, w } : LOOK.people.kidHairFit);
+  }
   else if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1, height);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   // a child's arms are shorter and thinner: scaling the upper arm shrinks the whole arm, hand included
@@ -89,8 +94,9 @@ function addHair(head, mat, child, crownY, fit = LOOK.people.hairFit) {
   hair.position.set(0, (h * lift) / ws, 0);
   head.add(hair);
   // the cap: down to the brow for the child (a bowl cut), shorter and fuller at the back for the grown-up
-  const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.1, 28, 18, 0, Math.PI * 2, 0, Math.PI * (child ? 0.6 : 0.5)), mat);
-  cap.scale.set(1.0, child ? 1.0 : 0.92, 1.06);
+  const { cut = 0.6, w = 1 } = fit; // the child's bowl: how far down it comes (fraction of a half turn) and how wide
+  const cap = new THREE.Mesh(new THREE.SphereGeometry(r * 1.1, 28, 18, 0, Math.PI * 2, 0, Math.PI * (child ? cut : 0.5)), mat);
+  cap.scale.set(child ? w : 1.0, child ? 1.0 : 0.92, 1.06);
   cap.position.set(0, r * 0.06, -r * 0.04);
   hair.add(cap);
   if (child) return;
