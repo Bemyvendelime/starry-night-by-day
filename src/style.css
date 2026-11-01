@@ -36,7 +36,7 @@ body { margin: 0; background: var(--void); color: var(--chalk); font-family: var
 .read .hintTop { margin: 0 0 18px; text-align: center; font: 400 12px/1.4 var(--f-ko); letter-spacing: .08em; color: var(--ash); transition: opacity .6s; }
 .read.scrolled .hintTop { opacity: 0; }
 .read h2 { margin: 0 0 18px; font: 400 20px/1.5 var(--f-ko); }
-.read .body p { margin: 0 0 1.15em; word-break: keep-all; overflow-wrap: anywhere; }
+.read .body p { margin: 0 0 1.15em; word-break: keep-all; overflow-wrap: anywhere; white-space: pre-line; }
 .read .sign { margin: 1.4em 0 0; text-align: right; color: var(--ash); }
 .read .done { display: flex; justify-content: center; margin-top: 26px; }
 .read .done button { font: 400 15px var(--f-ko); color: var(--chalk); background: rgba(255,255,255,.04); border: 1px solid rgba(233,230,223,.32); border-radius: 999px; padding: 9px 22px; cursor: pointer; }
