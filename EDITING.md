@@ -19,8 +19,8 @@
 | 호숫가 그림 위치(마을이 보이나 하늘만 보이나) | `src/js/content/look.js` | `lake.horizon` |
 | 공중을 도는 붓질 조각 수·진하기, 큰 별 수 | `src/js/content/look.js` | `lake.strokes`, `lake.strokeOpacity`, `lake.stars` |
 | 아이 둘레 빛, 손 흔드는 빠르기 | `src/js/content/look.js` | `childGlow`, `waveSpeed` |
-| 사람 모델 파일·키·아이 머리 크기·머리카락 | `src/js/content/look.js` | `people` (model, childModel, adultHeight, childHeight, childHeadScale, hair, hairFit) |
-| 물속 아이가 손 흔드는 동작(클립 이름·손 드는 시간·되풀이 구간·멈춘 화면의 순간·손 뻗는 거리) | `src/js/content/look.js` | `people.wave` |
+| 사람 모델 파일·키·아이 머리 크기·팔 길이·바가지 머리 | `src/js/content/look.js` | `people` (model, childModel, adultHeight, childHeight, childHeadScale, childArmScale, kidHair, kidHairFit, hair, hairFit) |
+| 물속 아이가 손 흔드는 동작(클립 이름·손 드는 시간·되풀이 구간·멈춘 화면의 순간·손 뻗는 거리·빠르기 speed) | `src/js/content/look.js` | `people.wave` |
 | 물속 사람을 비추는 화면 크기 | `src/js/content/look.js` | `people.waterFrame` |
 | 창틀 아이패드가 켜지는 장면 | `src/js/content/beats.js` | `ipad: true` 를 단 장면 |
 | 글자 찍는 속도 | `src/js/content/look.js` | `typing` |
@@ -47,7 +47,7 @@
 
 사람 모델을 바꿀 때는 뼈대가 있는 glTF(.glb)를 `src/assets/models/` 에 넣고 `look.js` 의 `people.model`(어른)·`people.childModel`(물속 아이)을 바꿉니다. `people.js` 가 뼈 이름(Mixamo·Quaternius·언리얼식)을 찾아 같은 자세를 다시 잡습니다. 머리카락이 없는 마네킹 모델이면 `people.hair` 를 true 로. 출처는 `src/assets/models/CREDITS.json` 에 적습니다(제출 PDF 3쪽 크레디트가 여기서 채워짐).
 
-지금 모델(2026-11-01 교체): 어른 = Quaternius 'Hoodie Character', 아이 = Quaternius 'Casual Character', 둘 다 CC0(퍼블릭 도메인)이라 공개 저장소에 그대로 둬도 됩니다. 처음에 쓴 three.js 예제 X Bot 은 Mixamo 모델이라 원본 파일 재배포가 막혀 있어 바꿨습니다. 아이 손 흔들기는 모델에 든 Wave 클립을 키프레임에서 바로 읽어 씁니다(AnimationMixer 는 값이 안 바뀐 뼈를 다시 쓰지 않아서, 그 위에 자세를 덧대면 멈춘 화면에서 손이 내려가 있었음).
+지금 모델(2026-11-02 교체): 어른 = Quaternius 'Business Man'(정장), 아이 = Quaternius 'Hoodie Character'를 아이 비율로 줄이고 바가지 머리를 씌움, 둘 다 CC0(퍼블릭 도메인)이라 공개 저장소에 그대로 둬도 됩니다. 처음에 쓴 three.js 예제 X Bot 은 Mixamo 모델이라 원본 파일 재배포가 막혀 있어 바꿨습니다. 아이 손 흔들기는 모델에 든 Wave 클립을 키프레임에서 바로 읽어 씁니다(AnimationMixer 는 값이 안 바뀐 뼈를 다시 쓰지 않아서, 그 위에 자세를 덧대면 멈춘 화면에서 손이 내려가 있었음).
 
 ## 시점 맞추기 (?dev)
 

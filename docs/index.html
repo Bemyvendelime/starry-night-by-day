@@ -1138,22 +1138,22 @@ var LOOK = {
   // 사람 모델 (뼈대가 있는 glTF 하나를 복제해 씀. 바꾸면 world/people.js 가 뼈 이름을 찾아 자세를 다시 잡음)
   people: {
     model: "assets/models/person.glb",
-    // 어른 (Quaternius 'Hoodie Character', CC0)
+    // 어른 (Quaternius 'Business Man', CC0 — 정장 차림. 이전엔 'Hoodie Character')
     childModel: "assets/models/child.glb",
-    // 물속 아이 (Quaternius 'Casual Character', CC0). 비우면 어른 모델을 줄여 씀
+    // 물속 아이 (Quaternius 'Hoodie Character', CC0 — 후드티 차림을 아이 비율로 줄여 씀). 비우면 어른 모델을 줄여 씀
     idleClip: "Idle_Neutral$",
     // 서 있는 기본 자세를 가져올 애니메이션 이름 (없으면 모델의 기본 자세)
     idleTime: 0.5,
     // 물속 아이가 손 흔드는 애니메이션 (없으면 IK 로 흔듦): 처음 up 초 동안 손을 들고, 그 뒤 up~up+loop 구간을 되풀이.
     // still = 움직임 없는 화면(캡처·동작 줄이기)에서 멈춰 둘 순간. 이 숫자들은 Quaternius Wave 클립을 재서 정함
     // out·lift = 클립보다 손을 옆으로·위로 더 뻗는 거리(m)
-    wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.75, out: 0.1, lift: 0.05 },
+    wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.42, out: 0.1, lift: 0.05 },
     hair: false,
     // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
     kidHair: true,
-    // 물속 아이: 모델의 머리(묶은 머리)를 숨기고 둥근 머리 + 바가지 머리를 씌움
-    kidHairFit: { size: 0.5, lift: 0.5 },
-    // 둥근 머리 반지름·높이 (머리뼈~정수리 거리에 대한 비율). 바가지 머리는 그보다 1.1배
+    // 물속 아이: 모델의 머리카락 위에 바가지 머리(이마 위에서 수평으로 자른 둥근 머리)를 씌움
+    kidHairFit: { size: 0.54, lift: 0.38 },
+    // 바가지 머리 크기·높이 (머리뼈~정수리 거리에 대한 비율, ?hairdebug 로 빨갛게 확인)
     childArmScale: 0.78,
     // 아이 팔 길이·굵기 (1 = 모델 그대로, 작을수록 짧고 가늘게)
     hairFit: { size: 0.66, lift: 0.62 },
@@ -4950,7 +4950,7 @@ function makePerson({ height, mat, headScale = 1, kid = false }) {
   body.position.y = -box2.min.y * s;
   const bones = findBones(body);
   root.updateMatrixWorld(true);
-  if (kid && LOOK.people.kidHair && bones.head) addKidHead(body, bones.head, mat, height);
+  if (kid && LOOK.people.kidHair && bones.head) addHair(bones.head, mat, true, height, LOOK.people.kidHairFit);
   else if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1, height);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   const arm = kid ? LOOK.people.childArmScale ?? 1 : 1;
@@ -4961,25 +4961,6 @@ function makePerson({ height, mat, headScale = 1, kid = false }) {
   const y = (b) => b ? b.getWorldPosition(new THREE8.Vector3()).y : 0;
   const tpose = Math.abs(y(bones.handL) - y(bones.upperArmL)) < 0.1 * (height / 1.7);
   return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
-}
-function addKidHead(body, head, mat, crownY) {
-  body.traverse((o) => {
-    if (o.isMesh && /head/i.test(o.name)) o.visible = false;
-  });
-  head.updateMatrixWorld(true);
-  const h = crownY - head.getWorldPosition(new THREE8.Vector3()).y;
-  const ws = head.getWorldScale(new THREE8.Vector3()).x;
-  const { size: size2, lift } = LOOK.people.kidHairFit;
-  const r = h * size2 / ws;
-  const g2 = new THREE8.Group();
-  g2.position.set(0, h * lift / ws, 0);
-  head.add(g2);
-  const skull = new THREE8.Mesh(new THREE8.SphereGeometry(r, 28, 20), mat);
-  skull.scale.set(0.92, 1, 0.98);
-  g2.add(skull);
-  const bowl = new THREE8.Mesh(new THREE8.SphereGeometry(r * 1.1, 32, 18, 0, Math.PI * 2, 0, Math.PI * 0.56), mat);
-  bowl.position.set(0, r * 0.08, -r * 0.03);
-  g2.add(bowl);
 }
 function addHair(head, mat, child2, crownY, fit = LOOK.people.hairFit) {
   head.updateMatrixWorld(true);
@@ -4997,15 +4978,10 @@ function addHair(head, mat, child2, crownY, fit = LOOK.people.hairFit) {
   cap.scale.set(1, child2 ? 1 : 0.92, 1.06);
   cap.position.set(0, r * 0.06, -r * 0.04);
   hair.add(cap);
+  if (child2) return;
   const back2 = new THREE8.Mesh(new THREE8.SphereGeometry(r * 1.04, 20, 12, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.25), mat);
   back2.position.set(0, -r * 0.05, -r * 0.12);
   hair.add(back2);
-  if (child2) {
-    const tuft = new THREE8.Mesh(new THREE8.ConeGeometry(r * 0.12, r * 0.55, 8), mat);
-    tuft.position.set(r * 0.1, r * 1.15, -r * 0.2);
-    tuft.rotation.set(-0.5, 0, -0.4);
-    hair.add(tuft);
-  }
 }
 var wq = new THREE8.Quaternion();
 function axes(p) {

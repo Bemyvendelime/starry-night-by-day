@@ -25,17 +25,17 @@ export const LOOK = {
 
   // 사람 모델 (뼈대가 있는 glTF 하나를 복제해 씀. 바꾸면 world/people.js 가 뼈 이름을 찾아 자세를 다시 잡음)
   people: {
-    model: "assets/models/person.glb", // 어른 (Quaternius 'Hoodie Character', CC0)
-    childModel: "assets/models/child.glb", // 물속 아이 (Quaternius 'Casual Character', CC0). 비우면 어른 모델을 줄여 씀
+    model: "assets/models/person.glb", // 어른 (Quaternius 'Business Man', CC0 — 정장 차림. 이전엔 'Hoodie Character')
+    childModel: "assets/models/child.glb", // 물속 아이 (Quaternius 'Hoodie Character', CC0 — 후드티 차림을 아이 비율로 줄여 씀). 비우면 어른 모델을 줄여 씀
     idleClip: "Idle_Neutral$", // 서 있는 기본 자세를 가져올 애니메이션 이름 (없으면 모델의 기본 자세)
     idleTime: 0.5,
     // 물속 아이가 손 흔드는 애니메이션 (없으면 IK 로 흔듦): 처음 up 초 동안 손을 들고, 그 뒤 up~up+loop 구간을 되풀이.
     // still = 움직임 없는 화면(캡처·동작 줄이기)에서 멈춰 둘 순간. 이 숫자들은 Quaternius Wave 클립을 재서 정함
     // out·lift = 클립보다 손을 옆으로·위로 더 뻗는 거리(m)
-    wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.75, out: 0.1, lift: 0.05 },
+    wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.42, out: 0.1, lift: 0.05 },
     hair: false, // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
-    kidHair: true, // 물속 아이: 모델의 머리(묶은 머리)를 숨기고 둥근 머리 + 바가지 머리를 씌움
-    kidHairFit: { size: 0.5, lift: 0.5 }, // 둥근 머리 반지름·높이 (머리뼈~정수리 거리에 대한 비율). 바가지 머리는 그보다 1.1배
+    kidHair: true, // 물속 아이: 모델의 머리카락 위에 바가지 머리(이마 위에서 수평으로 자른 둥근 머리)를 씌움
+    kidHairFit: { size: 0.54, lift: 0.38 }, // 바가지 머리 크기·높이 (머리뼈~정수리 거리에 대한 비율, ?hairdebug 로 빨갛게 확인)
     childArmScale: 0.78, // 아이 팔 길이·굵기 (1 = 모델 그대로, 작을수록 짧고 가늘게)
     hairFit: { size: 0.66, lift: 0.62 }, // 머리 크기에 대한 머리카락 반지름·높이 비율 (주소에 ?hairdebug 를 붙이면 빨갛게 보임)
     adultHeight: 1.72, // 어른 키(m)

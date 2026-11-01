@@ -60,7 +60,7 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   const bones = findBones(body);
   root.updateMatrixWorld(true);
   // the crown is the model's top (height): its distance from the head bone sizes the hair when there is no head-top bone
-  if (kid && LOOK.people.kidHair && bones.head) addKidHead(body, bones.head, mat, height);
+  if (kid && LOOK.people.kidHair && bones.head) addHair(bones.head, mat, true, height, LOOK.people.kidHairFit);
   else if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1, height);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   // a child's arms are shorter and thinner: scaling the upper arm shrinks the whole arm, hand included
@@ -73,27 +73,8 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
 }
 
-// The child model's own head carries hair tied back (it read as a ponytail in the water), so it is hidden and a
-// round head with a bowl cut, level all round just above the brows, sits on the head bone instead.
-function addKidHead(body, head, mat, crownY) {
-  body.traverse((o) => { if (o.isMesh && /head/i.test(o.name)) o.visible = false; });
-  head.updateMatrixWorld(true);
-  const h = crownY - head.getWorldPosition(new THREE.Vector3()).y; // head bone (top of the neck) to the crown
-  const ws = head.getWorldScale(new THREE.Vector3()).x;
-  const { size, lift } = LOOK.people.kidHairFit;
-  const r = (h * size) / ws;
-  const g = new THREE.Group();
-  g.position.set(0, (h * lift) / ws, 0);
-  head.add(g);
-  const skull = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 20), mat);
-  skull.scale.set(0.92, 1, 0.98);
-  g.add(skull);
-  const bowl = new THREE.Mesh(new THREE.SphereGeometry(r * 1.1, 32, 18, 0, Math.PI * 2, 0, Math.PI * 0.56), mat);
-  bowl.position.set(0, r * 0.08, -r * 0.03);
-  g.add(bowl);
-}
-
 // A bald mannequin reads as a doll; a cap of hair on the head bone reads as a person.
+// For the child it is a bowl cut: one cap over the model's own hair, cut level all round just above the brows.
 // The head bone's +y runs up through the skull (glTF bones point along +y).
 function addHair(head, mat, child, crownY, fit = LOOK.people.hairFit) {
   head.updateMatrixWorld(true);
@@ -112,15 +93,10 @@ function addHair(head, mat, child, crownY, fit = LOOK.people.hairFit) {
   cap.scale.set(1.0, child ? 1.0 : 0.92, 1.06);
   cap.position.set(0, r * 0.06, -r * 0.04);
   hair.add(cap);
+  if (child) return;
   const back = new THREE.Mesh(new THREE.SphereGeometry(r * 1.04, 20, 12, 0, Math.PI * 2, Math.PI * 0.45, Math.PI * 0.25), mat);
   back.position.set(0, -r * 0.05, -r * 0.12);
   hair.add(back);
-  if (child) { // a cowlick
-    const tuft = new THREE.Mesh(new THREE.ConeGeometry(r * 0.12, r * 0.55, 8), mat);
-    tuft.position.set(r * 0.1, r * 1.15, -r * 0.2);
-    tuft.rotation.set(-0.5, 0, -0.4);
-    hair.add(tuft);
-  }
 }
 
 const wq = new THREE.Quaternion();
