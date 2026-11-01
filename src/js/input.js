@@ -22,14 +22,7 @@ export function initInput() {
     down = null;
     if (dt < 350 && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)) { dx < 0 ? next() : prev(); return; }
     if (Math.hypot(dx, dy) > 10) return;
-    if (G.k === 1) { // the red badge has to be pressed; after two misses it opens anyway
-      const r = canvas.getBoundingClientRect();
-      ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
-      const hit = ray.intersectObject(screenMesh)[0];
-      if (hit && hit.uv.x < BADGE_UV.hitU && hit.uv.y > BADGE_UV.hitV) return next();
-      if (++G.badgeMisses < 2) { el.hintTxt.textContent = HINTS.badgeMiss; return; }
-    }
-    next();
+    next(); // the drafts badge has no hint any more, so any tap opens the letter
   });
   let wheelSum = 0, wheelLock = false, wheelTimer = 0;
   addEventListener("wheel", (e) => {

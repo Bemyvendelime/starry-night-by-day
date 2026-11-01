@@ -22,14 +22,17 @@ export function drawScreen(t) {
   sx.font = '22px "Nanum Gothic Coding", ui-monospace, monospace';
   sx.fillStyle = "#6d6b67"; sx.textAlign = "center"; sx.fillText(SCREEN.file, SW / 2, 37); sx.textAlign = "left";
   envelope(26, 16, 34, 25, "#bdbab3");
-  if (S.badge) {
+  if (S.badge) { // "임시보관함 1": the drafts folder with its count lit
+    sx.font = '400 22px "Noto Sans KR", sans-serif'; sx.fillStyle = S.pulse ? "#e8e5de" : "#8f8c86";
+    sx.fillText(SCREEN.drafts, 74, 37);
+    const bx = 74 + sx.measureText(SCREEN.drafts).width + 24, by = 29;
     if (S.pulse) {
       const k = (t * 0.7) % 1;
       sx.strokeStyle = `rgba(232,50,42,${(1 - k) * 0.8})`; sx.lineWidth = 3;
-      sx.beginPath(); sx.arc(66, 18, 13 + k * 26, 0, Math.PI * 2); sx.stroke();
+      sx.beginPath(); sx.arc(bx, by, 13 + k * 26, 0, Math.PI * 2); sx.stroke();
     }
-    sx.fillStyle = RED; sx.beginPath(); sx.arc(66, 18, 13, 0, Math.PI * 2); sx.fill();
-    sx.fillStyle = "#fff"; sx.font = '500 17px "Jost", sans-serif'; sx.textAlign = "center"; sx.fillText("1", 66, 24); sx.textAlign = "left";
+    sx.fillStyle = RED; sx.beginPath(); sx.arc(bx, by, 13, 0, Math.PI * 2); sx.fill();
+    sx.fillStyle = "#fff"; sx.font = '500 17px "Jost", sans-serif'; sx.textAlign = "center"; sx.fillText("1", bx, by + 6); sx.textAlign = "left";
   }
   sx.font = '26px "Nanum Gothic Coding", ui-monospace, monospace';
   CODE.forEach(([line, dim], i) => {

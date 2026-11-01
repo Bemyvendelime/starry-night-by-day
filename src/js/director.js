@@ -8,7 +8,7 @@ import { U } from "./core/uniforms.js";
 import { tween, setCam, rig, clamp } from "./core/motion.js";
 import { typer, finalOf } from "./core/typer.js";
 import { sound } from "./audio/sound.js";
-import { winSky, sitHead, ipad } from "./world/room.js";
+import { winSky, sitHead, ipad, winBars } from "./world/room.js";
 import { fold } from "./world/lake.js";
 import { ovU } from "./ui/overlay.js";
 import { drawWall, wallText, sideText } from "./ui/walls.js";
@@ -91,6 +91,7 @@ export function applyBeat(n, animate) {
   const [rev, sat] = b.sky || [0, 0];
   tween(winSky.uniforms.uReveal, "value", rev, anim ? 2.6 : 0);
   tween(winSky.uniforms.uSat, "value", sat, anim ? 3.2 : 0);
+  winBars.visible = rev === 0; // the cross bars go once the painting shows through the window
   tween(sitHead.rotation, "y", b.head ? 0.95 : 0, anim ? 2.4 : 0, anim ? 0.3 : 0);
   tween(sitHead.rotation, "x", b.head ? 0.12 : 0, anim ? 2.4 : 0, anim ? 0.3 : 0);
   if (world === "lake") {
@@ -144,7 +145,7 @@ export function applyBeat(n, animate) {
     const out = (s, done) => showText(b, s, done, anim);
     if (anim) later(() => typer.run(ops, out, !!b.music), camDur > 0 ? Math.min(camDur * 550, 1300) : crossWorld ? 1600 : 250);
     else out(finalOf(ops), true);
-  }
+  } else if (b.fold && anim) later(startFold, 600); // no line to finish: fold as soon as the scene opens
 
   // the whole letter to scroll through
   el.read.hidden = true; el.read.classList.remove("on");
@@ -164,7 +165,7 @@ export function applyBeat(n, animate) {
 function startEnd(anim) {
   el.card.hidden = false; el.send.disabled = true;
   el.to.textContent = ""; el.subj.textContent = "";
-  el.note.textContent = ENDING.note; el.footer.textContent = ENDING.footer; el.send.textContent = ENDING.send;
+  el.note.textContent = ENDING.note; el.note.hidden = !ENDING.note; el.footer.textContent = ENDING.footer; el.send.textContent = ENDING.send;
   if (!anim) { el.to.textContent = ENDING.to; el.subj.textContent = ENDING.subject; el.send.disabled = false; return; }
   typer.run([["p", 900], ["t", ENDING.to]], (s, done) => {
     el.to.textContent = s; el.to.classList.toggle("caret", !done);

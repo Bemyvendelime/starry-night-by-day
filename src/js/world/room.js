@@ -86,8 +86,10 @@ box(0.05, 1.4, 0.06, 0, 0, -0.58, woodMat, winFrame);
 box(0.05, 1.4, 0.06, 0, 0, 0.58, woodMat, winFrame);
 box(0.05, 0.06, 1.22, 0, 0.68, 0, woodMat, winFrame);
 box(0.05, 0.06, 1.22, 0, -0.68, 0, woodMat, winFrame);
-box(0.04, 1.3, 0.035, 0, 0, 0, woodMat, winFrame);
-box(0.04, 0.035, 1.1, 0, 0.12, 0, woodMat, winFrame);
+export const winBars = new THREE.Group(); // the cross bars (the director hides them once the painting shows)
+winFrame.add(winBars);
+box(0.04, 1.3, 0.035, 0, 0, 0, woodMat, winBars);
+box(0.04, 0.035, 1.1, 0, 0.12, 0, woodMat, winBars);
 box(0.16, 0.035, 1.3, 0.05, -0.72, 0, woodMat, winFrame);
 
 // glow in front of the monitor

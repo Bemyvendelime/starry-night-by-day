@@ -75,7 +75,7 @@ function frame(ts) {
 
 (async () => {
   setLoader(0.25);
-  const allText = Object.values(LINES).map(finalOf).join("") + Object.values(ENDING).join("") + "받는사람제목(없음)임시저장됨오후보내기나를설명하는법";
+  const allText = Object.values(LINES).map(finalOf).join("") + Object.values(ENDING).join("") + "받는사람제목(없음)임시저장됨오후보내기나를설명하는법보관함";
   const fonts = Promise.all([
     document.fonts.load('400 40px "Noto Sans KR"', allText),
     document.fonts.load('300 17px "Noto Sans KR"', allText),
