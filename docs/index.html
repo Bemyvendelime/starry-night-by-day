@@ -122,9 +122,18 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 .dev textarea { width: 100%; box-sizing: border-box; resize: vertical; font-family: ui-monospace, monospace; }
 .dev #devRead { font-family: ui-monospace, monospace; color: var(--ash); }
 .shot .bar { display: none; }
+
+/* no WebGL (graphics acceleration off): the story as still pictures, see js/fallback.js */
+#flat { position: fixed; inset: 0; z-index: 5; background: var(--void); cursor: pointer; }
+#flat img { width: 100%; height: 100%; object-fit: contain; display: block; }
+#flat .note { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); left: 16px; right: 16px; margin: 0; text-align: center; font: 300 13px/1.6 var(--f-ko); color: var(--ash); word-break: keep-all; transition: opacity .6s; }
+#flat.started .note { opacity: 0; }
+#flat .count { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin: 0; text-align: center; font: 400 12px/1 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
+.nogl .read { z-index: 6; }
+.nogl canvas, .nogl .bar { display: none; }
 </style>
 <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.8.2/dist/es-module-shims.js"></script><!-- import maps for older Safari / in-app browsers -->
-<script>setTimeout(function () { var l = document.getElementById("loader"); if (l && l.isConnected && getComputedStyle(l).getPropertyValue("--p").trim() !== "1") { var p = document.createElement("p"); p.style.cssText = "position:fixed;left:0;right:0;bottom:12vh;text-align:center;font:300 15px/1.7 sans-serif;color:#bbb;padding:0 16px"; p.textContent = "이 브라우저에서 3D 장면을 불러오지 못했어요. 크롬에서 열거나, 휴대폰 카메라로 PDF의 QR을 찍어 주세요."; l.appendChild(p); } }, 20000);</script>
+<script>setTimeout(function () { var l = document.getElementById("loader"); if (document.documentElement.classList.contains("nogl")) return; if (l && l.isConnected && getComputedStyle(l).getPropertyValue("--p").trim() !== "1") { var p = document.createElement("p"); p.style.cssText = "position:fixed;left:0;right:0;bottom:12vh;text-align:center;font:300 15px/1.7 sans-serif;color:#bbb;padding:0 16px"; p.textContent = "이 브라우저에서 3D 장면을 불러오지 못했어요. 크롬에서 열거나, 휴대폰 카메라로 PDF의 QR을 찍어 주세요."; l.appendChild(p); } }, 20000);</script>
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <!--/HEAD-->
 </head>
@@ -189,6 +198,97 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 
 <img id="starryImg" hidden alt="빈센트 반 고흐, 별이 빛나는 밤, 1889" src="assets/starry.jpg">
 
+<script type="module">
+// src/js/content/beats.js
+var BEATS = [
+  { label: "어두운 방", cam: "wide", hint: "room" },
+  { label: "임시보관함", cam: "screen", badge: true },
+  { label: "편지", cam: "screen", compose: true, line: "l1", show: "screen" },
+  { label: "편지", cam: "screen", compose: true, line: "l2", show: "screen" },
+  { label: "창", cam: "window", compose: true, line: "l3", show: "side", sky: [0.5, 0.3], head: true, music: true, chord: 0, arc: [0.35, 0.18, 0.1] },
+  { label: "창", cam: "window3", compose: true, line: "l4", show: "side", sky: [1, 1], head: true, ipad: true, music: true, chord: 2 },
+  { label: "그림 속으로", cam: "into", sky: [1, 1], head: true, paint: true, music: true, chord: 3 },
+  { label: "별밤 속", cam: "lakeBack", world: "lake", read: true, music: true, chord: 0 },
+  { label: "다 읽고", cam: "lakeFold", world: "lake", fold: true, music: true, chord: 2 },
+  { label: "내려다보면", cam: "lakeDown", world: "lake", line: "l5", show: "capHigh", pov: true, drop: true, music: true, chord: 1 },
+  { label: "받는 사람", cam: "lakeDown", world: "lake", pov: true, end: true, music: true, chord: 0 }
+];
+
+// src/js/content/letter.js
+var LETTER = {
+  title: "",
+  paragraphs: [
+    "살면서 처음으로 이 그림을 뚫어져라 마주 보았다. 오묘한 감정이 느껴진다. 배경화면으로 설정했을 당시의 느낌을 떠올려 보면 그림은 내게 상당히 어둡게 느껴졌었다. 다시 보니 의외로 흰색도 많고 되게 밝게 느껴지는 것은 신선하게 다가왔다. 아마 중앙의 거대한 사이프러스 나무가 내 눈에 먼저 들어와서 그랬었나 싶다. 뒤틀려버린 사이프러스 나무, 고흐에게 세상은 어떤 이미지였을까? 고흐, 그 사람에 대해서 더 알아 보고만 싶어졌다. 그는 방랑자였다. 외톨이였지만 동생과의 유대감이 컸다고 하더라. 인간관계라는 것이 참 어렵다. 외로움이라는 것은 내 의지와 보통 상관이 없던데, 겪어야만 하는 고통이라는 사실이 참 버겁다. 하지만, 그 고독 속에서만 쥐어짤 수 있는 아름다움이 있는 것 같다. 비록 그는 정신병원에 가게 되었지만.. 전문가라는 사람들의 사이프러스 나무에 대한 해석은 ‘죽음’ 또는 ‘애도’ 라고 한다. 그리고 거대하게 솟아오른 모습은 땅과 하늘을 이어주는 통로가 되어준다나.",
+    "나는 생각이 달랐다. 사이프러스 나무 그 자체의 길쭉한 모습이면 모를까 뒤틀리고 흔들거리는 고흐의 사이프러스는 그런 의미가 아닐 것이라고 생각한다. 배경중에 사실상 유일한 피사체인 그 나무는 본인의 모습이지 않았을까? 그가 그림을 그렸을 순서를 생각해본다. 역시나 배경을 그리고 나서 덩어리들을 그렸을 것 같다. 좀 꼬불꼬불은 하지만 밝고 아름다운 밤의 모습, 거기에 시커먼 나무 한 그루. 특유의 두터운 붓질과 뚜렷한 색의 대비가 만드는 유난히 밝은 밤, 본인은 그 밝음 아래에서도 어두운 존재로 느껴졌을 지도 모른다. 어쩌면 이건 내 모습인가? 이 정도는 아닌 것 같기는 한데.. 난 나를 별이라고 생각했다. 별은 밤이 되어서야 잘 보이니까. 그래서 사람들은 거대한 태양이 없는 밤이 되어서야 별을 마주할 수 있다. 낮에 빛나는 별은 무슨 의미일까? 낮에도 별은 항상 있는 걸. 굳이 자신을 드러내려고 애쓰지 않는 모습은 내게 감동을 준다.",
+    "요즈음에 들어 문득 한가지 생각이 들었다. 나는 나에 대해 익숙해지기만 하고 나를 설명하는 법을 모르겠다는 것이다."
+  ],
+  sign: ""
+};
+
+// src/js/fallback.js
+function hasGL() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+if (!hasGL() || new URLSearchParams(location.search).has("flat")) start();
+function start() {
+  document.documentElement.classList.add("nogl");
+  document.getElementById("loader")?.classList.add("done");
+  const flat = document.createElement("div");
+  flat.id = "flat";
+  flat.innerHTML = '<img alt=""><p class="note">이 브라우저는 그래픽 가속(WebGL)이 꺼져 있어 장면을 그림으로 보여 드려요. 화면을 누르면 다음 장면으로 넘어갑니다.</p><p class="count"></p>';
+  document.body.append(flat);
+  const img = flat.querySelector("img"), count = flat.querySelector(".count");
+  const read = document.getElementById("read"), body = document.getElementById("readBody");
+  const title = document.getElementById("readTitle"), sign = document.getElementById("readSign");
+  const pic = (n) => `assets/fallback/b${n}.jpg`;
+  let k = 0;
+  const reading = () => !!BEATS[k].read;
+  function show(n) {
+    k = Math.max(0, Math.min(BEATS.length - 1, n));
+    img.src = pic(k);
+    img.alt = BEATS[k].label;
+    count.textContent = `${String(k + 1).padStart(2, "0")} / ${String(BEATS.length).padStart(2, "0")} · ${BEATS[k].label}`;
+    if (k + 1 < BEATS.length) new Image().src = pic(k + 1);
+    flat.classList.toggle("started", k > 0);
+    read.hidden = !reading();
+    read.classList.toggle("on", reading());
+    if (reading()) {
+      title.textContent = LETTER.title;
+      title.hidden = !LETTER.title;
+      sign.textContent = LETTER.sign;
+      sign.hidden = !LETTER.sign;
+      body.replaceChildren(...LETTER.paragraphs.map((t) => Object.assign(document.createElement("p"), { textContent: t })));
+      read.classList.add("still");
+      read.classList.remove("scrolled");
+      read.scrollTop = 0;
+      read.focus({ preventScroll: true });
+    }
+  }
+  flat.addEventListener("click", () => {
+    if (!reading()) show(k + 1);
+  });
+  document.getElementById("readDone").addEventListener("click", (e) => {
+    e.stopPropagation();
+    show(k + 1);
+  });
+  read.addEventListener("scroll", () => read.classList.toggle("scrolled", read.scrollTop > 8), { passive: true });
+  addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "Enter" || !reading() && (e.key === " " || e.key === "PageDown")) {
+      e.preventDefault();
+      show(k + 1);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      show(k - 1);
+    }
+  });
+  show(0);
+}
+</script>
 <script type="module">
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -5857,6 +5957,7 @@ function frame(ts) {
   requestAnimationFrame(frame);
 }
 (async () => {
+  if (document.documentElement.classList.contains("nogl")) return;
   setLoader(0.25);
   const allText = Object.values(LINES).map(finalOf).join("") + Object.values(ENDING).join("") + "받는사람제목(없음)임시저장됨오후보내기나를설명하는법보관함";
   const fonts = Promise.all([

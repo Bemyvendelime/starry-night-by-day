@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Gaegu&family=Jost:wght@300;400;500&family=Nanum+Gothic+Coding&family=Noto+Sans+KR:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="style.css">
 <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.8.2/dist/es-module-shims.js"></script><!-- import maps for older Safari / in-app browsers -->
-<script>setTimeout(function () { var l = document.getElementById("loader"); if (l && l.isConnected && getComputedStyle(l).getPropertyValue("--p").trim() !== "1") { var p = document.createElement("p"); p.style.cssText = "position:fixed;left:0;right:0;bottom:12vh;text-align:center;font:300 15px/1.7 sans-serif;color:#bbb;padding:0 16px"; p.textContent = "이 브라우저에서 3D 장면을 불러오지 못했어요. 크롬에서 열거나, 휴대폰 카메라로 PDF의 QR을 찍어 주세요."; l.appendChild(p); } }, 20000);</script>
+<script>setTimeout(function () { var l = document.getElementById("loader"); if (document.documentElement.classList.contains("nogl")) return; if (l && l.isConnected && getComputedStyle(l).getPropertyValue("--p").trim() !== "1") { var p = document.createElement("p"); p.style.cssText = "position:fixed;left:0;right:0;bottom:12vh;text-align:center;font:300 15px/1.7 sans-serif;color:#bbb;padding:0 16px"; p.textContent = "이 브라우저에서 3D 장면을 불러오지 못했어요. 크롬에서 열거나, 휴대폰 카메라로 PDF의 QR을 찍어 주세요."; l.appendChild(p); } }, 20000);</script>
 <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <!--/HEAD-->
 </head>
@@ -81,6 +81,7 @@
 
 <img id="starryImg" hidden alt="빈센트 반 고흐, 별이 빛나는 밤, 1889" src="assets/starry.jpg">
 
+<script type="module" src="js/fallback.js"></script>
 <script type="module" src="js/main.js"></script>
 <!--/BODY-->
 </body>

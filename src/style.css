@@ -105,3 +105,12 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 .dev textarea { width: 100%; box-sizing: border-box; resize: vertical; font-family: ui-monospace, monospace; }
 .dev #devRead { font-family: ui-monospace, monospace; color: var(--ash); }
 .shot .bar { display: none; }
+
+/* no WebGL (graphics acceleration off): the story as still pictures, see js/fallback.js */
+#flat { position: fixed; inset: 0; z-index: 5; background: var(--void); cursor: pointer; }
+#flat img { width: 100%; height: 100%; object-fit: contain; display: block; }
+#flat .note { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); left: 16px; right: 16px; margin: 0; text-align: center; font: 300 13px/1.6 var(--f-ko); color: var(--ash); word-break: keep-all; transition: opacity .6s; }
+#flat.started .note { opacity: 0; }
+#flat .count { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin: 0; text-align: center; font: 400 12px/1 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
+.nogl .read { z-index: 6; }
+.nogl canvas, .nogl .bar { display: none; }

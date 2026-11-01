@@ -66,6 +66,8 @@ noscript = (
 page = (SRC / "index.html").read_text(encoding="utf-8")
 css = (SRC / "style.css").read_text(encoding="utf-8")
 page = page.replace('<link rel="stylesheet" href="style.css">', "<style>\n" + css + "</style>")
+fallback = (BUILD / "fallback.js").read_text(encoding="utf-8").replace("</script", "<\\/script")
+page = page.replace('<script type="module" src="js/fallback.js"></script>', '<script type="module">\n' + fallback + "</script>")
 page = page.replace('<script type="module" src="js/main.js"></script>', '<script type="module">\n' + bundle + "</script>")
 page = page.replace("%%NOSCRIPT%%", noscript)
 (DOCS / "index.html").write_text(page, encoding="utf-8")

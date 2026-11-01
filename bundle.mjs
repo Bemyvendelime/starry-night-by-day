@@ -15,3 +15,14 @@ await build({
     setup(b) { b.onResolve({ filter: /^three$/ }, () => ({ path: "three", external: true })); },
   }],
 });
+
+// the no-WebGL picture version: content only, no three.js, so it runs where the 3D page cannot
+await build({
+  entryPoints: ["src/js/fallback.js"],
+  bundle: true,
+  format: "esm",
+  outfile: "build/fallback.js",
+  charset: "utf8",
+  legalComments: "none",
+  logLevel: "warning",
+});
