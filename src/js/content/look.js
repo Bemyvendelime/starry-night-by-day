@@ -34,12 +34,15 @@ export const LOOK = {
     // out·lift = 클립보다 손을 옆으로·위로 더 뻗는 거리(m)
     wave: { clip: "[|]Wave$|^Wave$", up: 0.67, loop: 0.41, still: 0.83, speed: 0.75, out: 0.1, lift: 0.05 },
     hair: false, // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
+    kidHair: true, // 물속 아이에게만 바가지 머리(이마까지 덮는 둥근 머리)를 씌움
+    kidHairFit: { size: 0.64, lift: 0.45 }, // 바가지 머리 크기·높이 (머리뼈~정수리 거리에 대한 비율, ?hairdebug 로 빨갛게 확인)
+    childArmScale: 0.78, // 아이 팔 길이·굵기 (1 = 모델 그대로, 작을수록 짧고 가늘게)
     hairFit: { size: 0.66, lift: 0.62 }, // 머리 크기에 대한 머리카락 반지름·높이 비율 (주소에 ?hairdebug 를 붙이면 빨갛게 보임)
     adultHeight: 1.72, // 어른 키(m)
-    childHeight: 1.2, // 아이 키(m)
-    childHeadScale: 1.12, // 아이 머리를 몸에 비해 크게
+    childHeight: 1.0, // 아이 키(m)
+    childHeadScale: 1.4, // 아이 머리를 몸에 비해 크게
     // 물속 인물 화면: 머리에서 drop(m) 아래를 가운데로, 위아래 half(m) 만큼, tilt(라디안) 위에서 내려다봄
-    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.35 }, child: { drop: 0.1, half: 0.36, tilt: 0.2 } },
+    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.35 }, child: { drop: 0.12, half: 0.8, tilt: 0.2 } },
   },
 
   // 물에 비친 아이

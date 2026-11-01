@@ -31,7 +31,8 @@ function bindClip(body, clip) {
   return clip.tracks.flatMap((track) => {
     const dot = track.name.lastIndexOf(".");
     const obj = body.getObjectByName(track.name.slice(0, dot)), prop = track.name.slice(dot + 1);
-    return obj && obj[prop] ? [{ obj, prop, at: track.createInterpolant() }] : [];
+    // scale tracks are left out: the head and arm sizes set in makePerson must survive every clip
+    return obj && obj[prop] && prop !== "scale" ? [{ obj, prop, at: track.createInterpolant() }] : [];
   });
 }
 function setClipPose(bound, time) {
@@ -57,8 +58,13 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   body.scale.setScalar(s);
   body.position.y = -box.min.y * s;
   const bones = findBones(body);
-  if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1);
+  root.updateMatrixWorld(true);
+  // the crown is the model's top (height): its distance from the head bone sizes the hair when there is no head-top bone
+  if ((LOOK.people.hair || (kid && LOOK.people.kidHair)) && bones.head) addHair(bones.head, mat, kid || headScale !== 1, height, kid ? LOOK.people.kidHairFit : LOOK.people.hairFit);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
+  // a child's arms are shorter and thinner: scaling the upper arm shrinks the whole arm, hand included
+  const arm = kid ? LOOK.people.childArmScale ?? 1 : 1;
+  if (arm !== 1) for (const b of [bones.upperArmL, bones.upperArmR]) if (b) b.scale.setScalar(arm);
   root.updateMatrixWorld(true);
   // a T-pose (hands level with the shoulders) needs its arms brought down; an idle pose already has them down
   const y = (b) => (b ? b.getWorldPosition(new THREE.Vector3()).y : 0);
@@ -68,13 +74,13 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
 
 // A bald mannequin reads as a doll; a cap of hair on the head bone reads as a person.
 // The head bone's +y runs up through the skull (glTF bones point along +y).
-function addHair(head, mat, child) {
+function addHair(head, mat, child, crownY, fit = LOOK.people.hairFit) {
   head.updateMatrixWorld(true);
   const hp = head.getWorldPosition(new THREE.Vector3());
   const top = head.children.find((c) => /top/i.test(c.name));
-  const h = top ? top.getWorldPosition(new THREE.Vector3()).distanceTo(hp) : 0.2;
+  const h = top ? top.getWorldPosition(new THREE.Vector3()).distanceTo(hp) : crownY != null ? crownY - hp.y : 0.2;
   const ws = head.getWorldScale(new THREE.Vector3()).x;
-  const { size, lift } = LOOK.people.hairFit;
+  const { size, lift } = fit;
   const r = (h * size) / ws;
   if (new URLSearchParams(location.search).has("hairdebug")) mat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const hair = new THREE.Group();
