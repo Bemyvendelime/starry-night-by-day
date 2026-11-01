@@ -114,3 +114,5 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 #flat .count { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin: 0; text-align: center; font: 400 12px/1 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
 .nogl .read { z-index: 6; }
 .nogl canvas, .nogl .bar { display: none; }
+.fin .sent { margin: 0 0 18px; font: 400 13px/1.6 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
+.nogl .card, .nogl .fin { z-index: 7; }

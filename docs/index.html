@@ -131,6 +131,8 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 #flat .count { position: absolute; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin: 0; text-align: center; font: 400 12px/1 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
 .nogl .read { z-index: 6; }
 .nogl canvas, .nogl .bar { display: none; }
+.fin .sent { margin: 0 0 18px; font: 400 13px/1.6 var(--f-ko); letter-spacing: .08em; color: var(--ash); }
+.nogl .card, .nogl .fin { z-index: 7; }
 </style>
 <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.8.2/dist/es-module-shims.js"></script><!-- import maps for older Safari / in-app browsers -->
 <script>setTimeout(function () { var l = document.getElementById("loader"); if (document.documentElement.classList.contains("nogl")) return; if (l && l.isConnected && getComputedStyle(l).getPropertyValue("--p").trim() !== "1") { var p = document.createElement("p"); p.style.cssText = "position:fixed;left:0;right:0;bottom:12vh;text-align:center;font:300 15px/1.7 sans-serif;color:#bbb;padding:0 16px"; p.textContent = "이 브라우저에서 3D 장면을 불러오지 못했어요. 크롬에서 열거나, 휴대폰 카메라로 PDF의 QR을 찍어 주세요."; l.appendChild(p); } }, 20000);</script>
@@ -162,6 +164,7 @@ noscript .text { position: fixed; inset: 0; overflow: auto; background: var(--vo
 
 <section id="fin" class="fin" hidden>
   <div>
+    <p class="sent">편지를 보냈어요 · 보낸 편지함 1</p>
     <h1>낮에도 별은 빛나니까</h1>
     <div class="by">허대훈 · 신세계 지식향연 2026 「예술을 바꾼 혁명, 인상주의」</div>
     <div class="credit">빈센트 반 고흐, 「별이 빛나는 밤」, 1889, 뉴욕 현대미술관(MoMA) 소장. 이미지: Google Art Project, Wikimedia Commons(퍼블릭 도메인).</div>
@@ -225,6 +228,13 @@ var BEATS = [
 ];
 
 // src/js/content/letter.js
+var ENDING = {
+  to: "2013년 처음 미술관에 간 나에게",
+  subject: "낮에도 별은 빛나니까",
+  note: "",
+  send: "보내기",
+  footer: ""
+};
 var LETTER = {
   title: "",
   paragraphs: [
@@ -262,13 +272,27 @@ function start() {
   const img = flat.querySelector("img"), count = flat.querySelector(".count");
   const read = document.getElementById("read"), body = document.getElementById("readBody");
   const title = document.getElementById("readTitle"), sign = document.getElementById("readSign");
+  const card = document.getElementById("card"), fin = document.getElementById("fin"), send = document.getElementById("send");
   const pic = (n) => `assets/fallback/b${n}.jpg`;
   let k = 0;
   const reading = () => !!BEATS[k].read;
   function show(n) {
     k = Math.max(0, Math.min(BEATS.length - 1, n));
-    img.src = pic(k);
+    const end = !!BEATS[k].end;
+    img.src = pic(end ? k - 1 : k);
     img.alt = BEATS[k].label;
+    fin.hidden = true;
+    card.hidden = !end;
+    if (end) {
+      document.getElementById("to").textContent = ENDING.to;
+      document.getElementById("subj").textContent = ENDING.subject;
+      const note = document.getElementById("cardNote");
+      note.textContent = ENDING.note;
+      note.hidden = !ENDING.note;
+      document.getElementById("cardFooter").textContent = ENDING.footer;
+      send.textContent = ENDING.send;
+      send.disabled = false;
+    }
     count.textContent = `${String(k + 1).padStart(2, "0")} / ${String(BEATS.length).padStart(2, "0")} · ${BEATS[k].label}`;
     if (k + 1 < BEATS.length) new Image().src = pic(k + 1);
     flat.classList.toggle("started", k > 0);
@@ -289,6 +313,13 @@ function start() {
   flat.addEventListener("click", () => {
     if (!reading()) show(k + 1);
   });
+  send.addEventListener("click", () => {
+    card.hidden = true;
+    fin.hidden = false;
+    document.getElementById("again").focus({ preventScroll: true });
+  });
+  document.getElementById("again").addEventListener("click", () => show(0));
+  document.getElementById("replay").addEventListener("click", () => show(BEATS.findIndex((b) => b.world === "lake")));
   document.getElementById("readDone").addEventListener("click", (e) => {
     e.stopPropagation();
     show(k + 1);
@@ -1120,9 +1151,9 @@ var LOOK = {
     hair: false,
     // 머리카락이 없는 마네킹 모델이면 true: 머리뼈에 머리카락을 붙임
     kidHair: true,
-    // 물속 아이에게만 바가지 머리(이마까지 덮는 둥근 머리)를 씌움
-    kidHairFit: { size: 0.64, lift: 0.45 },
-    // 바가지 머리 크기·높이 (머리뼈~정수리 거리에 대한 비율, ?hairdebug 로 빨갛게 확인)
+    // 물속 아이: 모델의 머리(묶은 머리)를 숨기고 둥근 머리 + 바가지 머리를 씌움
+    kidHairFit: { size: 0.5, lift: 0.5 },
+    // 둥근 머리 반지름·높이 (머리뼈~정수리 거리에 대한 비율). 바가지 머리는 그보다 1.1배
     childArmScale: 0.78,
     // 아이 팔 길이·굵기 (1 = 모델 그대로, 작을수록 짧고 가늘게)
     hairFit: { size: 0.66, lift: 0.62 },
@@ -1134,7 +1165,7 @@ var LOOK = {
     childHeadScale: 1.4,
     // 아이 머리를 몸에 비해 크게
     // 물속 인물 화면: 머리에서 drop(m) 아래를 가운데로, 위아래 half(m) 만큼, tilt(라디안) 위에서 내려다봄
-    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.35 }, child: { drop: 0.12, half: 0.8, tilt: 0.2 } }
+    waterFrame: { adult: { drop: 0.13, half: 0.36, tilt: 0.35 }, child: { drop: 0.02, half: 0.4, tilt: 0.2 } }
   },
   // 물에 비친 아이
   childGlow: 0.85,
@@ -4919,7 +4950,8 @@ function makePerson({ height, mat, headScale = 1, kid = false }) {
   body.position.y = -box2.min.y * s;
   const bones = findBones(body);
   root.updateMatrixWorld(true);
-  if ((LOOK.people.hair || kid && LOOK.people.kidHair) && bones.head) addHair(bones.head, mat, kid || headScale !== 1, height, kid ? LOOK.people.kidHairFit : LOOK.people.hairFit);
+  if (kid && LOOK.people.kidHair && bones.head) addKidHead(body, bones.head, mat, height);
+  else if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1, height);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   const arm = kid ? LOOK.people.childArmScale ?? 1 : 1;
   if (arm !== 1) {
@@ -4929,6 +4961,25 @@ function makePerson({ height, mat, headScale = 1, kid = false }) {
   const y = (b) => b ? b.getWorldPosition(new THREE8.Vector3()).y : 0;
   const tpose = Math.abs(y(bones.handL) - y(bones.upperArmL)) < 0.1 * (height / 1.7);
   return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
+}
+function addKidHead(body, head, mat, crownY) {
+  body.traverse((o) => {
+    if (o.isMesh && /head/i.test(o.name)) o.visible = false;
+  });
+  head.updateMatrixWorld(true);
+  const h = crownY - head.getWorldPosition(new THREE8.Vector3()).y;
+  const ws = head.getWorldScale(new THREE8.Vector3()).x;
+  const { size: size2, lift } = LOOK.people.kidHairFit;
+  const r = h * size2 / ws;
+  const g2 = new THREE8.Group();
+  g2.position.set(0, h * lift / ws, 0);
+  head.add(g2);
+  const skull = new THREE8.Mesh(new THREE8.SphereGeometry(r, 28, 20), mat);
+  skull.scale.set(0.92, 1, 0.98);
+  g2.add(skull);
+  const bowl = new THREE8.Mesh(new THREE8.SphereGeometry(r * 1.1, 32, 18, 0, Math.PI * 2, 0, Math.PI * 0.56), mat);
+  bowl.position.set(0, r * 0.08, -r * 0.03);
+  g2.add(bowl);
 }
 function addHair(head, mat, child2, crownY, fit = LOOK.people.hairFit) {
   head.updateMatrixWorld(true);

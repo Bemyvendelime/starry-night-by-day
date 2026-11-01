@@ -2,7 +2,7 @@
 // Tap or → goes on, ← goes back; the lakeside beat still opens the whole letter to scroll through.
 // Pictures: assets/fallback/b<beat>.jpg (shot with ?shot, the lake one with ?shot&noread). ?flat forces this mode.
 import { BEATS } from "./content/beats.js";
-import { LETTER } from "./content/letter.js";
+import { LETTER, ENDING } from "./content/letter.js";
 
 function hasGL() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch { return false; }
@@ -20,13 +20,22 @@ function start() {
   const img = flat.querySelector("img"), count = flat.querySelector(".count");
   const read = document.getElementById("read"), body = document.getElementById("readBody");
   const title = document.getElementById("readTitle"), sign = document.getElementById("readSign");
+  const card = document.getElementById("card"), fin = document.getElementById("fin"), send = document.getElementById("send");
   const pic = (n) => `assets/fallback/b${n}.jpg`;
   let k = 0;
   const reading = () => !!BEATS[k].read;
 
   function show(n) {
     k = Math.max(0, Math.min(BEATS.length - 1, n));
-    img.src = pic(k); img.alt = BEATS[k].label;
+    const end = !!BEATS[k].end; // the last beat: the real card over the picture before it, and 보내기 leads to the ending
+    img.src = pic(end ? k - 1 : k); img.alt = BEATS[k].label;
+    fin.hidden = true; card.hidden = !end;
+    if (end) {
+      document.getElementById("to").textContent = ENDING.to; document.getElementById("subj").textContent = ENDING.subject;
+      const note = document.getElementById("cardNote"); note.textContent = ENDING.note; note.hidden = !ENDING.note;
+      document.getElementById("cardFooter").textContent = ENDING.footer;
+      send.textContent = ENDING.send; send.disabled = false;
+    }
     count.textContent = `${String(k + 1).padStart(2, "0")} / ${String(BEATS.length).padStart(2, "0")} · ${BEATS[k].label}`;
     if (k + 1 < BEATS.length) new Image().src = pic(k + 1);
     flat.classList.toggle("started", k > 0);
@@ -40,6 +49,9 @@ function start() {
   }
 
   flat.addEventListener("click", () => { if (!reading()) show(k + 1); });
+  send.addEventListener("click", () => { card.hidden = true; fin.hidden = false; document.getElementById("again").focus({ preventScroll: true }); });
+  document.getElementById("again").addEventListener("click", () => show(0));
+  document.getElementById("replay").addEventListener("click", () => show(BEATS.findIndex((b) => b.world === "lake")));
   document.getElementById("readDone").addEventListener("click", (e) => { e.stopPropagation(); show(k + 1); });
   read.addEventListener("scroll", () => read.classList.toggle("scrolled", read.scrollTop > 8), { passive: true });
   addEventListener("keydown", (e) => {

@@ -60,7 +60,8 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   const bones = findBones(body);
   root.updateMatrixWorld(true);
   // the crown is the model's top (height): its distance from the head bone sizes the hair when there is no head-top bone
-  if ((LOOK.people.hair || (kid && LOOK.people.kidHair)) && bones.head) addHair(bones.head, mat, kid || headScale !== 1, height, kid ? LOOK.people.kidHairFit : LOOK.people.hairFit);
+  if (kid && LOOK.people.kidHair && bones.head) addKidHead(body, bones.head, mat, height);
+  else if (LOOK.people.hair && bones.head) addHair(bones.head, mat, headScale !== 1, height);
   if (headScale !== 1 && bones.head) bones.head.scale.setScalar(headScale);
   // a child's arms are shorter and thinner: scaling the upper arm shrinks the whole arm, hand included
   const arm = kid ? LOOK.people.childArmScale ?? 1 : 1;
@@ -70,6 +71,26 @@ export function makePerson({ height, mat, headScale = 1, kid = false }) {
   const y = (b) => (b ? b.getWorldPosition(new THREE.Vector3()).y : 0);
   const tpose = Math.abs(y(bones.handL) - y(bones.upperArmL)) < 0.1 * (height / 1.7);
   return { root, body, bones, base: snapshot(bones), clips: src.animations, tpose, idlePose };
+}
+
+// The child model's own head carries hair tied back (it read as a ponytail in the water), so it is hidden and a
+// round head with a bowl cut, level all round just above the brows, sits on the head bone instead.
+function addKidHead(body, head, mat, crownY) {
+  body.traverse((o) => { if (o.isMesh && /head/i.test(o.name)) o.visible = false; });
+  head.updateMatrixWorld(true);
+  const h = crownY - head.getWorldPosition(new THREE.Vector3()).y; // head bone (top of the neck) to the crown
+  const ws = head.getWorldScale(new THREE.Vector3()).x;
+  const { size, lift } = LOOK.people.kidHairFit;
+  const r = (h * size) / ws;
+  const g = new THREE.Group();
+  g.position.set(0, (h * lift) / ws, 0);
+  head.add(g);
+  const skull = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 20), mat);
+  skull.scale.set(0.92, 1, 0.98);
+  g.add(skull);
+  const bowl = new THREE.Mesh(new THREE.SphereGeometry(r * 1.1, 32, 18, 0, Math.PI * 2, 0, Math.PI * 0.56), mat);
+  bowl.position.set(0, r * 0.08, -r * 0.03);
+  g.add(bowl);
 }
 
 // A bald mannequin reads as a doll; a cap of hair on the head bone reads as a person.
