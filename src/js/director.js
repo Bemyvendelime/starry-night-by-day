@@ -31,6 +31,7 @@ function startFold() {
 
 // the whole letter, read at the reader's own pace (a `read` beat): scroll, then press the button
 function openRead(anim) {
+  if (location.search.includes("noread")) return; // ?shot&noread: a photo of the lake without the letter panel
   const r = el.read;
   el.readTitle.textContent = LETTER.title; el.readTitle.hidden = !LETTER.title;
   el.readSign.textContent = LETTER.sign; el.readSign.hidden = !LETTER.sign;

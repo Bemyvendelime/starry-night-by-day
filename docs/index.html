@@ -5439,6 +5439,7 @@ function startFold() {
   later(() => sound.paper(), t2 * 1e3);
 }
 function openRead(anim) {
+  if (location.search.includes("noread")) return;
   const r = el.read;
   el.readTitle.textContent = LETTER.title;
   el.readTitle.hidden = !LETTER.title;
